@@ -50,6 +50,8 @@ public class GameServiceImpl implements GameService {
     return this.board;
   }
 
+  public updateBoard() {}
+
   public String rematchGame() {
     if (gameStatus == GameStatus.REMATCH_WAITING) {
       gameStatus = GameStatus.IN_PROGRESS;
