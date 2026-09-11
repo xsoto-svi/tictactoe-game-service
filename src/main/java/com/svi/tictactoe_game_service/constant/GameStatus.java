@@ -1,4 +1,4 @@
-package com.svi.tictactoe_game_service.constants;
+package com.svi.tictactoe_game_service.constant;
 
 public enum GameStatus {
   WAITING,
