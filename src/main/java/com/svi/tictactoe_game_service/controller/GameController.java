@@ -1,12 +1,9 @@
 package com.svi.tictactoe_game_service.controller;
 
 import com.svi.tictactoe_game_service.constant.GameStatus;
-import com.svi.tictactoe_game_service.constant.PlayerSymbol;
-import com.svi.tictactoe_game_service.constant.SuccessMessage;
-import com.svi.tictactoe_game_service.model.dto.request.CreateGameRequest;
-import com.svi.tictactoe_game_service.model.dto.response.ApiResponse;
-import com.svi.tictactoe_game_service.model.dto.response.GameStatusResponse;
-import com.svi.tictactoe_game_service.model.dto.response.MatchMakingResponse;
+import com.svi.tictactoe_game_service.dto.request.JoinGameRequest;
+import com.svi.tictactoe_game_service.dto.response.CreateGameRequest;
+import com.svi.tictactoe_game_service.dto.response.MatchMakingResponse;
 import com.svi.tictactoe_game_service.service.GameService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -15,8 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/games")
@@ -29,43 +24,20 @@ public class GameController {
   }
 
   @PostMapping("create")
-  public ResponseEntity<ApiResponse> createGame(@Valid @RequestBody CreateGameRequest request) {
-    PlayerSymbol playerSymbol = gameService.createGame(request);
-
-    ApiResponse apiResponse = MatchMakingResponse.builder()
-            .message(SuccessMessage.CREATED_GAME.toString())
-            .playerSymbol(playerSymbol)
-            .build();
-
-    return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+  public ResponseEntity<MatchMakingResponse> createGame(@Valid @RequestBody CreateGameRequest request) {
+    MatchMakingResponse response = gameService.createGame(request);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
   @PostMapping("join")
-  public ResponseEntity<ApiResponse> joinGame(@Valid @RequestBody CreateGameRequest request) {
-    PlayerSymbol playerSymbol = gameService.joinGame(request);
-
-    ApiResponse apiResponse = MatchMakingResponse.builder()
-            .message(SuccessMessage.JOIN_GAME.toString())
-            .playerSymbol(playerSymbol)
-            .build();
-
-    return ResponseEntity.ok(apiResponse);
+  public ResponseEntity<MatchMakingResponse> joinGame(@Valid @RequestBody JoinGameRequest request) {
+    MatchMakingResponse response = gameService.joinGame(request);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
   @PostMapping("status")
-  public ResponseEntity<ApiResponse> checkGameStatus() {
+  public ResponseEntity<GameStatus> checkGameStatus() {
     GameStatus gameStatus = gameService.checkGameStatus();
-
-    ApiResponse apiResponse = GameStatusResponse.builder()
-            .message(SuccessMessage.JOIN_GAME.toString())
-            .gameStatus(gameStatus)
-            .build();
-
-    return ResponseEntity.ok(apiResponse);
-  }
-
-  @PostMapping("board-state")
-  public ResponseEntity<ApiResponse> checkBoardState() {
-    List<String> board = gameService.checkBoardState();
+    return ResponseEntity.status(HttpStatus.OK).body(gameStatus);
   }
 }
