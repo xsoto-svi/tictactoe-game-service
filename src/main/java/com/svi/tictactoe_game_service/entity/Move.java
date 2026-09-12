@@ -30,6 +30,6 @@ public class Move {
   @Column("location")
   private int location;
 
-  @Column("created_at")
-  private LocalDateTime createdAt;
+  @Column("date_saved")
+  private LocalDateTime dateSaved;
 }
