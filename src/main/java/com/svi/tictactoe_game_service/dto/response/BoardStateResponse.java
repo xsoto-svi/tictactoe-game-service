@@ -1,4 +1,4 @@
-package com.svi.tictactoe_game_service.model.dto.response;
+package com.svi.tictactoe_game_service.dto.response;
 
 import java.util.List;
 
