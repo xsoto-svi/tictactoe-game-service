@@ -1,4 +1,4 @@
-package com.svi.tictactoe_game_service.model.dto.request;
+package com.svi.tictactoe_game_service.dto.request;
 
 import com.svi.tictactoe_game_service.constant.PlayerSymbol;
 import jakarta.validation.constraints.NotBlank;

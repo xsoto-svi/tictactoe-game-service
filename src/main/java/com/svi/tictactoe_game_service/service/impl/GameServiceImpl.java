@@ -1,12 +1,20 @@
 package com.svi.tictactoe_game_service.service.impl;
 
+import com.svi.tictactoe_game_service.constant.ErrorMessage;
 import com.svi.tictactoe_game_service.constant.GameStatus;
 import com.svi.tictactoe_game_service.constant.PlayerSymbol;
 import com.svi.tictactoe_game_service.constant.SuccessMessage;
+import com.svi.tictactoe_game_service.dto.request.JoinGameRequest;
+import com.svi.tictactoe_game_service.entity.Player;
+import com.svi.tictactoe_game_service.entity.Room;
+import com.svi.tictactoe_game_service.util.EntityUtil;
 import com.svi.tictactoe_game_service.exception.RoomNotFoundException;
-import com.svi.tictactoe_game_service.model.dto.request.CreateGameRequest;
-import com.svi.tictactoe_game_service.model.dto.request.LeaveGameRequest;
-import com.svi.tictactoe_game_service.repository.GameRepository;
+import com.svi.tictactoe_game_service.dto.response.CreateGameRequest;
+import com.svi.tictactoe_game_service.dto.request.LeaveGameRequest;
+import com.svi.tictactoe_game_service.dto.response.MatchMakingResponse;
+import com.svi.tictactoe_game_service.repository.MoveRepository;
+import com.svi.tictactoe_game_service.repository.PlayerRepository;
+import com.svi.tictactoe_game_service.repository.RoomRepository;
 import com.svi.tictactoe_game_service.service.GameService;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +25,21 @@ import java.util.List;
 @Service
 public class GameServiceImpl implements GameService {
 
-  private final List<String> board;
+  private MoveRepository moveRepository;
+  private RoomRepository roomRepository;
+  private PlayerRepository playerRepository;
+
+  public GameServiceImpl(
+          MoveRepository moveRepository,
+          RoomRepository roomRepository,
+          PlayerRepository playerRepository
+  ) {
+    this.moveRepository = moveRepository;
+    this.roomRepository = roomRepository;
+    this.playerRepository = playerRepository;
+  }
+
+  private List<String> board;
   private int spectatorCount;
   private GameStatus gameStatus;
 
@@ -26,17 +48,33 @@ public class GameServiceImpl implements GameService {
     this.spectatorCount = 0;
   }
 
-  public PlayerSymbol createGame(CreateGameRequest createGameRequest) {
-    gameStatus = GameStatus.WAITING;
-    return PlayerSymbol.X;
+  public MatchMakingResponse createGame(CreateGameRequest request) {
+    gameStatus = GameStatus.WAITING; // repository call
+
+    return new MatchMakingResponse(PlayerSymbol.X);
+
   }
 
-  public PlayerSymbol joinGame(CreateGameRequest createGameRequest) {
-    if (gameStatus == GameStatus.WAITING) {
-      return PlayerSymbol.O;
-    } else if (gameStatus == GameStatus.IN_PROGRESS) {
+  public MatchMakingResponse joinGame(JoinGameRequest request) {
+    Room room = findRoom(request.roomCode());
+    GameStatus status = room.getStatus();
+    PlayerSymbol symbol = request.symbol();
+
+    if (status == GameStatus.WAITING) {
+      room.setStatus(GameStatus.IN_PROGRESS);
+      roomRepository.save(room);
+      return new MatchMakingResponse(PlayerSymbol.O);
+
+    } else if (status == GameStatus.IN_PROGRESS) {
       spectatorCount++;
-      return PlayerSymbol.SPECTATOR;
+      return new MatchMakingResponse(PlayerSymbol.SPECTATOR);
+
+    } else if (status == GameStatus.REMATCH_WAITING && symbol != PlayerSymbol.SPECTATOR) {
+      room.setStatus(GameStatus.IN_PROGRESS);
+
+    } else {
+      spectatorCount++;
+      return new MatchMakingResponse(PlayerSymbol.SPECTATOR);
     }
 
     throw new RoomNotFoundException();
@@ -47,10 +85,8 @@ public class GameServiceImpl implements GameService {
   }
 
   public List<String> checkBoardState() {
-    return this.board;
-  }
 
-  public updateBoard() {}
+  }
 
   public String rematchGame() {
     if (gameStatus == GameStatus.REMATCH_WAITING) {
@@ -70,5 +106,9 @@ public class GameServiceImpl implements GameService {
     if (leaveGameRequest.getPlayerSymbol() == PlayerSymbol.SPECTATOR) {
       spectatorCount--;
     }
+  }
+
+  private Room findRoom(String roomId) {
+    return EntityUtil.getOrThrow(roomRepository.findById(roomId), ErrorMessage.ROOM_NOT_FOUND.getMessage());
   }
 }

@@ -2,13 +2,15 @@ package com.svi.tictactoe_game_service.service;
 
 import com.svi.tictactoe_game_service.constant.GameStatus;
 import com.svi.tictactoe_game_service.constant.PlayerSymbol;
-import com.svi.tictactoe_game_service.model.dto.request.CreateGameRequest;
+import com.svi.tictactoe_game_service.dto.request.JoinGameRequest;
+import com.svi.tictactoe_game_service.dto.response.CreateGameRequest;
+import com.svi.tictactoe_game_service.dto.response.MatchMakingResponse;
 
 import java.util.List;
 
 public interface GameService {
-  PlayerSymbol createGame(CreateGameRequest createGameRequest);
-  PlayerSymbol joinGame(CreateGameRequest createGameRequest);
+  MatchMakingResponse createGame(CreateGameRequest request);
+  MatchMakingResponse joinGame(JoinGameRequest request);
   GameStatus checkGameStatus();
   List<String> checkBoardState();
   String rematchGame();
