@@ -4,5 +4,6 @@ public enum GameStatus {
   WAITING,
   IN_PROGRESS,
   FINISHED,
-  REMATCH_WAITING
+  REMATCH_WAITING,
+  CANCELLED
 }
