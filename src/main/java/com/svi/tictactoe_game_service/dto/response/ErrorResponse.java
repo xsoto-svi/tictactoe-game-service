@@ -1,6 +1,6 @@
 package com.svi.tictactoe_game_service.dto.response;
 
-public record ApiResponse(
+public record ErrorResponse(
         String message
 ) {
 }
