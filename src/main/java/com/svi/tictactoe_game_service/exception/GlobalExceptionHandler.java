@@ -1,5 +1,8 @@
 package com.svi.tictactoe_game_service.exception;
 
+import com.svi.tictactoe_game_service.dto.response.ErrorResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,13 +12,20 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  // Handles any general database error (including Cassandra save/query failures)
-  @ExceptionHandler(DataAccessException.class)
-  public ResponseEntity<> handleDatabaseException(DataAccessException ex) {
-    // Log the actual error internally for debugging
-    // log.error("Database error occurred: ", ex);
+  private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    ApiResponse response = new ApiResponse("A database error occurred. Please try again later.");
+  // Handles any general database error
+  @ExceptionHandler(DataAccessException.class)
+  public ResponseEntity<ErrorResponse> handleDatabaseException(DataAccessException ex) {
+    log.error("error: ", ex);
+    ErrorResponse response = new ErrorResponse("A database error occurred. Please try again later.");
+    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+  }
+
+  @ExceptionHandler(RoomNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handle(RoomNotFoundException ex) {
+    log.error("error: ", ex);
+    ErrorResponse response = new ErrorResponse(ex.getMessage());
     return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
   }
 }
