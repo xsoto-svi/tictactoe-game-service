@@ -1,8 +1,12 @@
-package com.svi.tictactoe_game_service.dto.response;
+package com.svi.tictactoe_game_service.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class CreateGameRequest {
+public record CreateGameRequest(
   @NotBlank(message = "Room code cannot be empty")
-  private String roomCode;
+  String roomCode,
+
+  @NotBlank(message = "Player name cannot be empty")
+  String playerName
+) {
 }

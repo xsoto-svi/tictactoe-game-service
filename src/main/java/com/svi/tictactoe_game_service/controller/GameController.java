@@ -2,7 +2,7 @@ package com.svi.tictactoe_game_service.controller;
 
 import com.svi.tictactoe_game_service.enums.GameStatus;
 import com.svi.tictactoe_game_service.dto.request.JoinGameRequest;
-import com.svi.tictactoe_game_service.dto.response.CreateGameRequest;
+import com.svi.tictactoe_game_service.dto.request.CreateGameRequest;
 import com.svi.tictactoe_game_service.dto.response.MatchMakingResponse;
 import com.svi.tictactoe_game_service.service.GameService;
 import jakarta.validation.Valid;
