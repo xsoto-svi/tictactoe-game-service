@@ -19,5 +19,5 @@ public class Player {
   private UUID gameId;
 
   @Column("room_code")
-  private UUID roomCode;
+  private String roomCode;
 }
