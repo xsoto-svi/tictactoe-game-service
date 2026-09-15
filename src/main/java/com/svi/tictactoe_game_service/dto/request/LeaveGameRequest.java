@@ -1,7 +1,6 @@
 package com.svi.tictactoe_game_service.dto.request;
 
-import com.svi.tictactoe_game_service.constant.PlayerSymbol;
-import jakarta.validation.constraints.NotBlank;
+import com.svi.tictactoe_game_service.enums.PlayerSymbol;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

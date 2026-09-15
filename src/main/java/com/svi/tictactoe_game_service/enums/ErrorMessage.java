@@ -1,6 +1,5 @@
-package com.svi.tictactoe_game_service.constant;
+package com.svi.tictactoe_game_service.enums;
 
-import com.svi.tictactoe_game_service.exception.ResourceNotFoundException;
 import lombok.Getter;
 
 @Getter

@@ -1,4 +1,4 @@
-package com.svi.tictactoe_game_service.constant;
+package com.svi.tictactoe_game_service.enums;
 
 public enum PlayerStatus {
   WIN,

@@ -1,21 +1,20 @@
 package com.svi.tictactoe_game_service.service.impl;
 
-import com.svi.tictactoe_game_service.constant.ErrorMessage;
-import com.svi.tictactoe_game_service.constant.GameStatus;
-import com.svi.tictactoe_game_service.constant.PlayerSymbol;
-import com.svi.tictactoe_game_service.constant.SuccessMessage;
+import com.svi.tictactoe_game_service.enums.ErrorMessage;
+import com.svi.tictactoe_game_service.enums.GameStatus;
+import com.svi.tictactoe_game_service.enums.PlayerSymbol;
+import com.svi.tictactoe_game_service.enums.SuccessMessage;
 import com.svi.tictactoe_game_service.dto.request.JoinGameRequest;
-import com.svi.tictactoe_game_service.entity.Player;
-import com.svi.tictactoe_game_service.entity.Room;
-import com.svi.tictactoe_game_service.util.EntityUtil;
-import com.svi.tictactoe_game_service.exception.RoomNotFoundException;
-import com.svi.tictactoe_game_service.dto.response.CreateGameRequest;
 import com.svi.tictactoe_game_service.dto.request.LeaveGameRequest;
+import com.svi.tictactoe_game_service.dto.response.CreateGameRequest;
 import com.svi.tictactoe_game_service.dto.response.MatchMakingResponse;
+import com.svi.tictactoe_game_service.entity.Room;
+import com.svi.tictactoe_game_service.exception.RoomNotFoundException;
 import com.svi.tictactoe_game_service.repository.MoveRepository;
 import com.svi.tictactoe_game_service.repository.PlayerRepository;
 import com.svi.tictactoe_game_service.repository.RoomRepository;
 import com.svi.tictactoe_game_service.service.GameService;
+import com.svi.tictactoe_game_service.util.EntityUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
