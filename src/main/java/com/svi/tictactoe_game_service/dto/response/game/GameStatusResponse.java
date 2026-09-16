@@ -1,4 +1,4 @@
-package com.svi.tictactoe_game_service.dto.response;
+package com.svi.tictactoe_game_service.dto.response.game;
 
 import com.svi.tictactoe_game_service.enums.GameStatus;
 

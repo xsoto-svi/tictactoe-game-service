@@ -4,76 +4,59 @@ import com.svi.tictactoe_game_service.dto.request.CreateGameRequest;
 import com.svi.tictactoe_game_service.dto.request.JoinGameRequest;
 import com.svi.tictactoe_game_service.dto.request.LeaveGameRequest;
 import com.svi.tictactoe_game_service.dto.response.MatchMakingResponse;
+import com.svi.tictactoe_game_service.dto.response.game.GameStatusResponse;
+import com.svi.tictactoe_game_service.dto.response.room.GetGamesByRoomResponse;
+import com.svi.tictactoe_game_service.dto.response.room.GetRoomsResponse;
 import com.svi.tictactoe_game_service.entity.Player;
 import com.svi.tictactoe_game_service.entity.Room;
 import com.svi.tictactoe_game_service.enums.ErrorMessage;
 import com.svi.tictactoe_game_service.enums.GameStatus;
 import com.svi.tictactoe_game_service.enums.PlayerSymbol;
 import com.svi.tictactoe_game_service.exception.RoomNotFoundException;
-import com.svi.tictactoe_game_service.repository.MoveRepository;
 import com.svi.tictactoe_game_service.repository.PlayerRepository;
 import com.svi.tictactoe_game_service.repository.RoomRepository;
 import com.svi.tictactoe_game_service.service.RoomService;
 import com.svi.tictactoe_game_service.util.EntityUtil;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class RoomServiceImpl implements RoomService {
 
-  private MoveRepository moveRepository;
-  private RoomRepository roomRepository;
-  private PlayerRepository playerRepository;
-
-  private final List<String> board;
-  private int spectatorCount;
-  private GameStatus gameStatus;
+  private final RoomRepository roomRepository;
+  private final PlayerRepository playerRepository;
 
   public RoomServiceImpl(
-          MoveRepository moveRepository,
           RoomRepository roomRepository,
           PlayerRepository playerRepository
   ) {
-    this.moveRepository = moveRepository;
     this.roomRepository = roomRepository;
     this.playerRepository = playerRepository;
-
-    this.board = new ArrayList<>(Collections.nCopies(9, ""));
-    this.spectatorCount = 0;
   }
 
   // returns player symbol
-  public MatchMakingResponse createGame(CreateGameRequest request) {
+  public MatchMakingResponse createGame(String roomCode, CreateGameRequest request) {
     UUID gameId = generateGameId();
-    saveRoom(request, gameId);
-    savePlayer(request, gameId);
+    saveNewRoom(roomCode, gameId, GameStatus.WAITING);
+    saveNewPlayer(request.playerName(), gameId, roomCode);
 
-    return new MatchMakingResponse(PlayerSymbol.X);
-
+    return new MatchMakingResponse(PlayerSymbol.X, gameId);
   }
 
   // returns player symbol
-  public MatchMakingResponse joinGame(JoinGameRequest request) {
-    Room room = findRoom(request.roomCode());
-    Player player = new Player();
+  public MatchMakingResponse joinGame(String roomCode, JoinGameRequest request) {
+    Room room = findRoom(roomCode);
 
     GameStatus status = room.getStatus();
     PlayerSymbol symbol = request.symbol();
-
-    player.setPlayerName(request.name());
-    player.setGameId(room.getGameId());
-    player.setRoomCode(request.roomCode());
 
     if (status == GameStatus.WAITING) {
       room.setStatus(GameStatus.IN_PROGRESS);
       symbol = PlayerSymbol.O;
 
     } else if (status != GameStatus.CANCELLED && status != GameStatus.CLOSED) {
-      spectatorCount++;
       symbol = PlayerSymbol.SPECTATOR;
 
     } else {
@@ -81,66 +64,109 @@ public class RoomServiceImpl implements RoomService {
     }
 
     if (symbol != PlayerSymbol.SPECTATOR) {
-      playerRepository.save(player);
+      saveNewPlayer(request.name(), room.getGameId(), roomCode);
       roomRepository.save(room);
     }
 
-    return new MatchMakingResponse(symbol);
+    return new MatchMakingResponse(symbol, room.getGameId());
   }
 
-  public GameStatus checkGameStatus() {
-    return this.gameStatus;
+  public GameStatusResponse checkGameStatus(String roomCode) {
+    Room room = findRoom(roomCode);
+
+    return new GameStatusResponse(room.getStatus());
   }
 
-  public List<String> checkBoardState() {
-
-  }
-
-  public void rematchGame(JoinGameRequest request) {
-    Room currRoom = findRoom(request.roomCode());
+  public void rematchGame(String roomCode, JoinGameRequest request) {
+    Room currRoom = findRoom(roomCode);
 
     GameStatus status = currRoom.getStatus();
-    PlayerSymbol currPlayerSymbol = request.symbol()
 
-    if (status == GameStatus.REMATCH_WAITING && currPlayerSymbol == PlayerSymbol.O) {
-      currRoom.setStatus(GameStatus.IN_PROGRESS);
-      currRoom.setGameId(generateGameId());
+    if (status == GameStatus.REMATCH_WAITING) {
+      // second player accepts
+
+      // Close current game
+      currRoom.setStatus(GameStatus.CLOSED);
+      roomRepository.save(currRoom);
+
+      saveNewRoom(roomCode, generateGameId(), GameStatus.IN_PROGRESS);
+
+//      List<Player> oldPlayers = playerRepository.findByGameId(currRoom.getGameId());
+//
+//      for (Player player : oldPlayers) {
+//        saveNewPlayer(player.getPlayerName(), newGameId, roomCode);
+//      }
+    } else {
+      // first player starts a rematch
+      currRoom.setStatus(GameStatus.REMATCH_WAITING);
       roomRepository.save(currRoom);
     }
   }
 
-  public void resetGame() {
-    this.board.clear();
-  }
+  public void leaveGame(String roomCode, LeaveGameRequest request) {
+    Room room = findRoom(roomCode);
 
-  public void leaveGame(LeaveGameRequest request) {
-    if (request.getPlayerSymbol() == PlayerSymbol.SPECTATOR) {
-      spectatorCount--;
+    if (room.getStatus() != GameStatus.CLOSED){
+      room.setStatus(GameStatus.CLOSED);
+      roomRepository.save(room);
     }
   }
 
+  public GetRoomsResponse getRooms() {
+    List<Room> rooms = roomRepository.findAll();
+
+    List<String> roomCodes = rooms.stream()
+            .map(Room::getRoomCode)
+            .toList();
+
+    return new GetRoomsResponse(roomCodes);
+  }
+
+  public GetGamesByRoomResponse getGamesByRoomCode(String roomCode) {
+    List<Room> rooms = roomRepository.findByRoomCode(roomCode);
+
+    List<UUID> gameIds = rooms.stream()
+            .map(Room::getGameId)
+            .toList();
+
+    return new GetGamesByRoomResponse(gameIds);
+  }
+
   // UTILS
-  private Room findRoom(String roomId) {
-    return EntityUtil.getOrThrow(roomRepository.findById(roomId), ErrorMessage.ROOM_NOT_FOUND.getMessage());
+  private Room findRoom(String roomCode) {
+    List<Room> rooms = roomRepository.findByRoomCode(roomCode);
+
+    if (rooms == null || rooms.isEmpty()) {
+      throw new RoomNotFoundException();
+    }
+
+    // Find the single active game in the room's history
+    return rooms.stream()
+            .filter(room -> room.getStatus() != GameStatus.CLOSED
+                    && room.getStatus() != GameStatus.CANCELLED)
+            .findFirst()
+            .orElseThrow(RoomNotFoundException::new);
   }
 
   private UUID generateGameId() {
     return UUID.randomUUID();
   }
 
-  private void saveRoom(CreateGameRequest request, UUID gameId) {
+  private void saveNewRoom(String roomCode, UUID gameId, GameStatus status) {
     Room room = new Room();
-    room.setRoomCode(request.roomCode());
-    room.setGameId(generateGameId());
-    room.setStatus(GameStatus.WAITING);
+    room.setRoomCode(roomCode);
+    room.setGameId(gameId);
+    room.setStatus(status);
 
     roomRepository.save(room);
   }
 
-  private void savePlayer(CreateGameRequest request, UUID gameId) {
+  private void saveNewPlayer(String playerName, UUID gameId, String roomCode) {
     Player player = new Player();
-    player.setPlayerName(request.playerName());
+    player.setPlayerName(playerName);
     player.setGameId(gameId);
-    player.setRoomCode(request.roomCode());
+    player.setRoomCode(roomCode);
+
+    playerRepository.save(player);
   }
 }

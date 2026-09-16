@@ -41,6 +41,4 @@ public class RoomController {
     MatchMakingResponse response = roomService.leaveGame(request);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
-
-
 }
