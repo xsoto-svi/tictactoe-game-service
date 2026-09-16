@@ -47,6 +47,7 @@ public class GameServiceImpl implements GameService {
     this.spectatorCount = 0;
   }
 
+  // returns player symbol
   public MatchMakingResponse createGame(CreateGameRequest request) {
     UUID gameId = generateGameId();
     saveRoom(request, gameId);
@@ -56,29 +57,32 @@ public class GameServiceImpl implements GameService {
 
   }
 
+  // returns player symbol
   public MatchMakingResponse joinGame(JoinGameRequest request) {
     Room room = findRoom(request.roomCode());
+    Player player = new Player();
+
     GameStatus status = room.getStatus();
     PlayerSymbol symbol = request.symbol();
+
+    player.setPlayerName(request.name());
+    player.setGameId(room.getGameId());
+    player.setRoomCode(request.roomCode());
 
     if (status == GameStatus.WAITING) {
       room.setStatus(GameStatus.IN_PROGRESS);
       symbol = PlayerSymbol.O;
 
-    } else if (status == GameStatus.IN_PROGRESS || status == GameStatus.REMATCH_WAITING) {
+    } else if (status != GameStatus.CANCELLED && status != GameStatus.CLOSED) {
       spectatorCount++;
       symbol = PlayerSymbol.SPECTATOR;
-
-      // prevents
-    } else if (status == GameStatus.REMATCH_WAITING && symbol == PlayerSymbol.O) {
-      room.setStatus(GameStatus.IN_PROGRESS);
-      roomRepository.save(room);
 
     } else {
       throw new RoomNotFoundException();
     }
 
     if (symbol != PlayerSymbol.SPECTATOR) {
+      playerRepository.save(player);
       roomRepository.save(room);
     }
 
@@ -93,15 +97,17 @@ public class GameServiceImpl implements GameService {
 
   }
 
-  public String rematchGame(JoinGameRequest request) {
-    Room room = findRoom(request.roomCode());
+  public void rematchGame(JoinGameRequest request) {
+    Room currRoom = findRoom(request.roomCode());
 
-    if (gameStatus == GameStatus.REMATCH_WAITING) {
-      room.setStatus(GameStatus.IN_PROGRESS);
-      roomRepository.save(room);
+    GameStatus status = currRoom.getStatus();
+    PlayerSymbol currPlayerSymbol = request.symbol()
+
+    if (status == GameStatus.REMATCH_WAITING && currPlayerSymbol == PlayerSymbol.O) {
+      currRoom.setStatus(GameStatus.IN_PROGRESS);
+      currRoom.setGameId(generateGameId());
+      roomRepository.save(currRoom);
     }
-
-    return "placeholder";
   }
 
   public void resetGame() {
