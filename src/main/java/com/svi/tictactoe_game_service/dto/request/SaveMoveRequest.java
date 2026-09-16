@@ -5,12 +5,12 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 public record SaveMoveRequest(
-        @NotNull(message = "Game ID cannot be null")
+        @NotNull(message = "roomCode cannot be null")
         @Pattern(
-                regexp = "^[A-Z0-9]{4}R*_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                message = "Invalid UUID format for gameId."
+                regexp = "^[A-Z0-9]{4}R*$",
+                message = "Invalid UUID format for roomCode."
         )
-        String gameId,
+        String roomCode,
 
         @NotBlank(message = "Player ID cannot be blank")
         String playerName,
