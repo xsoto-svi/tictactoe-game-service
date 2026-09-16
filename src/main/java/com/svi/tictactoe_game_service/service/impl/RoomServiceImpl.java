@@ -1,20 +1,19 @@
 package com.svi.tictactoe_game_service.service.impl;
 
+import com.svi.tictactoe_game_service.dto.request.CreateGameRequest;
+import com.svi.tictactoe_game_service.dto.request.JoinGameRequest;
+import com.svi.tictactoe_game_service.dto.request.LeaveGameRequest;
+import com.svi.tictactoe_game_service.dto.response.MatchMakingResponse;
 import com.svi.tictactoe_game_service.entity.Player;
+import com.svi.tictactoe_game_service.entity.Room;
 import com.svi.tictactoe_game_service.enums.ErrorMessage;
 import com.svi.tictactoe_game_service.enums.GameStatus;
 import com.svi.tictactoe_game_service.enums.PlayerSymbol;
-import com.svi.tictactoe_game_service.enums.SuccessMessage;
-import com.svi.tictactoe_game_service.dto.request.JoinGameRequest;
-import com.svi.tictactoe_game_service.dto.request.LeaveGameRequest;
-import com.svi.tictactoe_game_service.dto.request.CreateGameRequest;
-import com.svi.tictactoe_game_service.dto.response.MatchMakingResponse;
-import com.svi.tictactoe_game_service.entity.Room;
 import com.svi.tictactoe_game_service.exception.RoomNotFoundException;
 import com.svi.tictactoe_game_service.repository.MoveRepository;
 import com.svi.tictactoe_game_service.repository.PlayerRepository;
 import com.svi.tictactoe_game_service.repository.RoomRepository;
-import com.svi.tictactoe_game_service.service.GameService;
+import com.svi.tictactoe_game_service.service.RoomService;
 import com.svi.tictactoe_game_service.util.EntityUtil;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class GameServiceImpl implements GameService {
+public class RoomServiceImpl implements RoomService {
 
   private MoveRepository moveRepository;
   private RoomRepository roomRepository;
@@ -34,7 +33,7 @@ public class GameServiceImpl implements GameService {
   private int spectatorCount;
   private GameStatus gameStatus;
 
-  public GameServiceImpl(
+  public RoomServiceImpl(
           MoveRepository moveRepository,
           RoomRepository roomRepository,
           PlayerRepository playerRepository
