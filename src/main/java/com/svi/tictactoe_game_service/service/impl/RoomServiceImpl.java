@@ -132,6 +132,7 @@ public class RoomServiceImpl implements RoomService {
 
     List<String> roomCodes = rooms.stream()
             .map(Room::getRoomCode)
+            .distinct()
             .toList();
 
     return new GetRoomsResponse(roomCodes);

@@ -25,6 +25,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     List<String> playerNames = players.stream()
             .map(Player::getPlayerName)
+            .distinct()
             .toList();
 
     return new GetPlayersResponse(playerNames);
