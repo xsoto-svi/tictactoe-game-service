@@ -2,10 +2,7 @@ package com.svi.tictactoe_game_service.service.impl;
 
 import com.svi.tictactoe_game_service.dto.response.player.GetGamesByPlayerResponse;
 import com.svi.tictactoe_game_service.dto.response.player.GetPlayersResponse;
-import com.svi.tictactoe_game_service.dto.response.room.GetGamesByRoomResponse;
-import com.svi.tictactoe_game_service.dto.response.room.GetRoomsResponse;
 import com.svi.tictactoe_game_service.entity.Player;
-import com.svi.tictactoe_game_service.entity.Room;
 import com.svi.tictactoe_game_service.repository.PlayerRepository;
 import com.svi.tictactoe_game_service.service.PlayerService;
 import org.springframework.stereotype.Service;
@@ -33,7 +30,7 @@ public class PlayerServiceImpl implements PlayerService {
   }
 
   public GetGamesByPlayerResponse getGamesByPlayerName(String name){
-    List<Player> players = playerRepository.findByPlayerName(name);
+    List<Player> players = playerRepository.findAllByPlayerName(name);
 
     List<UUID> gameIds = players.stream()
             .map(Player::getGameId)

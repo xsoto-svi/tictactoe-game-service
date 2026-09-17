@@ -4,7 +4,7 @@ import com.svi.tictactoe_game_service.dto.request.room.CreateGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.JoinGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.LeaveGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.RematchGameRequest;
-import com.svi.tictactoe_game_service.dto.response.MatchMakingResponse;
+import com.svi.tictactoe_game_service.dto.response.room.MatchMakingResponse;
 import com.svi.tictactoe_game_service.dto.response.game.GameStatusResponse;
 import com.svi.tictactoe_game_service.dto.response.room.GetGamesByRoomResponse;
 import com.svi.tictactoe_game_service.dto.response.room.GetRoomsResponse;
@@ -92,7 +92,7 @@ public class RoomServiceImpl implements RoomService {
       saveNewRoom(roomCode, newGameId, GameStatus.IN_PROGRESS);
 
       // Add new game to current players
-      List<Player> oldPlayers = playerRepository.findByGameId(currRoom.getGameId());
+      List<Player> oldPlayers = playerRepository.findAllByGameId(currRoom.getGameId());
       for (Player oldPlayer : oldPlayers) {
         saveNewPlayer(oldPlayer.getPlayerName(), newGameId, roomCode);
       }
