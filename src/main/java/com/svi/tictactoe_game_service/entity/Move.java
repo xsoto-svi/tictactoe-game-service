@@ -1,10 +1,8 @@
 package com.svi.tictactoe_game_service.entity;
 
 import lombok.Data;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
 
@@ -21,8 +19,8 @@ public class Move {
   @PrimaryKeyColumn(name = "move_number", type = PrimaryKeyType.CLUSTERED)
   private int moveNumber;
 
-  @Column("player_name")
-  private String playerName;
+  @Column("name")
+  private String name;
 
   @Column("symbol")
   private String symbol;
