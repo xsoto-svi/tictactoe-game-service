@@ -2,7 +2,7 @@ package com.svi.tictactoe_game_service.dto.response.game;
 
 import java.util.List;
 
-public record GetGameResponse(
+public record GetGamesByGameIdResponse(
         List<MoveDto> moves
 ) {
   public record MoveDto(
