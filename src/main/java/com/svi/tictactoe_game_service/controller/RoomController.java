@@ -1,8 +1,8 @@
 package com.svi.tictactoe_game_service.controller;
 
-import com.svi.tictactoe_game_service.dto.request.LeaveGameRequest;
-import com.svi.tictactoe_game_service.dto.request.JoinGameRequest;
-import com.svi.tictactoe_game_service.dto.request.CreateGameRequest;
+import com.svi.tictactoe_game_service.dto.request.room.LeaveGameRequest;
+import com.svi.tictactoe_game_service.dto.request.room.JoinGameRequest;
+import com.svi.tictactoe_game_service.dto.request.room.CreateGameRequest;
 import com.svi.tictactoe_game_service.dto.response.MatchMakingResponse;
 import com.svi.tictactoe_game_service.service.RoomService;
 import jakarta.validation.Valid;

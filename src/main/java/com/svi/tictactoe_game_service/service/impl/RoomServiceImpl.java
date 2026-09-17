@@ -1,22 +1,20 @@
 package com.svi.tictactoe_game_service.service.impl;
 
-import com.svi.tictactoe_game_service.dto.request.CreateGameRequest;
-import com.svi.tictactoe_game_service.dto.request.JoinGameRequest;
-import com.svi.tictactoe_game_service.dto.request.LeaveGameRequest;
+import com.svi.tictactoe_game_service.dto.request.room.CreateGameRequest;
+import com.svi.tictactoe_game_service.dto.request.room.JoinGameRequest;
+import com.svi.tictactoe_game_service.dto.request.room.LeaveGameRequest;
 import com.svi.tictactoe_game_service.dto.response.MatchMakingResponse;
 import com.svi.tictactoe_game_service.dto.response.game.GameStatusResponse;
 import com.svi.tictactoe_game_service.dto.response.room.GetGamesByRoomResponse;
 import com.svi.tictactoe_game_service.dto.response.room.GetRoomsResponse;
 import com.svi.tictactoe_game_service.entity.Player;
 import com.svi.tictactoe_game_service.entity.Room;
-import com.svi.tictactoe_game_service.enums.ErrorMessage;
 import com.svi.tictactoe_game_service.enums.GameStatus;
 import com.svi.tictactoe_game_service.enums.PlayerSymbol;
 import com.svi.tictactoe_game_service.exception.RoomNotFoundException;
 import com.svi.tictactoe_game_service.repository.PlayerRepository;
 import com.svi.tictactoe_game_service.repository.RoomRepository;
 import com.svi.tictactoe_game_service.service.RoomService;
-import com.svi.tictactoe_game_service.util.EntityUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -79,7 +77,7 @@ public class RoomServiceImpl implements RoomService {
 
   public void rematchGame(String roomCode, JoinGameRequest request) {
     Room room = findRoom(roomCode);
-
+    String name = request.name();
 
     GameStatus status = room.getStatus();
 
@@ -101,7 +99,7 @@ public class RoomServiceImpl implements RoomService {
       // first player starts a rematch
       room.setStatus(GameStatus.REMATCH_WAITING);
       roomRepository.save(room);
-
+      playerRepository.save()
     }
   }
 
