@@ -37,12 +37,13 @@ public class RoomServiceImpl implements RoomService {
   }
 
   // returns player symbol
-  public MatchMakingResponse createGame(String roomCode, CreateGameRequest request) {
+  public MatchMakingResponse createGame(CreateGameRequest request) {
+    String roomCode = generateUniqueRoomCode();
     UUID gameId = generateGameId();
     saveNewRoom(roomCode, gameId, GameStatus.WAITING);
     saveNewPlayer(request.name(), gameId, roomCode);
 
-    return new MatchMakingResponse(PlayerSymbol.X, gameId);
+    return new MatchMakingResponse(PlayerSymbol.X, gameId, roomCode);
   }
 
   // returns player symbol
@@ -68,7 +69,7 @@ public class RoomServiceImpl implements RoomService {
       roomRepository.save(room);
     }
 
-    return new MatchMakingResponse(symbol, room.getGameId());
+    return new MatchMakingResponse(symbol, room.getGameId(), roomCode);
   }
 
   public GameStatusResponse checkGameStatus(String roomCode) {
@@ -158,6 +159,41 @@ public class RoomServiceImpl implements RoomService {
 
   private UUID generateGameId() {
     return UUID.randomUUID();
+  }
+
+  private String generateUniqueRoomCode() {
+    String roomCode;
+    do {
+      roomCode = generateRandom4CharCode();
+    } while (isRoomCodeInUse(roomCode));
+
+    return roomCode;
+  }
+
+  private String generateRandom4CharCode() {
+    String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    StringBuilder code = new StringBuilder();
+    java.util.Random rnd = new java.util.Random();
+
+    while (code.length() < 4) {
+      int index = (int) (rnd.nextFloat() * chars.length());
+      code.append(chars.charAt(index));
+    }
+    return code.toString();
+  }
+
+  private boolean isRoomCodeInUse(String roomCode) {
+    List<Room> rooms = roomRepository.findByRoomCode(roomCode);
+
+    if (rooms == null || rooms.isEmpty()) {
+      return false;
+    }
+
+    // If the code exists, check if there is currently an active game using it.
+    // If all past games with this code are CLOSED, we are free to recycle it safely.
+    return rooms.stream()
+            .anyMatch(room -> room.getStatus() != GameStatus.CLOSED
+                    && room.getStatus() != GameStatus.CANCELLED);
   }
 
   private void saveNewRoom(String roomCode, UUID gameId, GameStatus status) {

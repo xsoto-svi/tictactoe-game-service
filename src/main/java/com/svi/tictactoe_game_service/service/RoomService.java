@@ -11,11 +11,11 @@ import com.svi.tictactoe_game_service.dto.response.room.GetRoomsResponse;
 import com.svi.tictactoe_game_service.dto.response.room.RematchResponse;
 
 public interface RoomService {
-  MatchMakingResponse createGame(String roomCode, CreateGameRequest request);
+  MatchMakingResponse createGame(CreateGameRequest request);
   MatchMakingResponse joinGame(String roomCode, JoinGameRequest request);
-  GameStatusResponse checkGameStatus(String roomCode);
   void leaveGame(String roomCode, LeaveGameRequest request);
   RematchResponse rematchGame(String roomCode, RematchGameRequest request);
+  GameStatusResponse checkGameStatus(String roomCode);
   GetRoomsResponse getRooms();
   GetGamesByRoomResponse getGamesByRoomCode(String roomCode);
 }

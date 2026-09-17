@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public record MatchMakingResponse (
         PlayerSymbol symbol,
-        UUID gameId
+        UUID gameId,
+        String roomCode
 ) {
 }

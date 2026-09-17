@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 public record SaveMoveRequest(
         @NotNull(message = "Room code cannot be null")
         @Pattern(
-                regexp = "^[A-Z0-9]{4}R*$",
-                message = "Invalid UUID format for room code."
+                regexp = "^[A-Z0-9]{4}$",
+                message = "Invalid format for room code."
         )
         String roomCode,
 
