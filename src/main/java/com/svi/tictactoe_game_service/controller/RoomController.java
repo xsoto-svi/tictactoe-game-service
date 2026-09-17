@@ -6,6 +6,7 @@ import com.svi.tictactoe_game_service.dto.request.room.CreateGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.RematchGameRequest;
 import com.svi.tictactoe_game_service.dto.response.MatchMakingResponse;
 import com.svi.tictactoe_game_service.dto.response.game.GameStatusResponse;
+import com.svi.tictactoe_game_service.dto.response.room.GetGamesByRoomResponse;
 import com.svi.tictactoe_game_service.dto.response.room.GetRoomsResponse;
 import com.svi.tictactoe_game_service.dto.response.room.RematchResponse;
 import com.svi.tictactoe_game_service.service.RoomService;
@@ -84,12 +85,12 @@ public class RoomController {
   }
 
   @GetMapping("rooms/{roomCode}/games")
-  public ResponseEntity<GameStatusResponse> getGamesByRoomCode(
+  public ResponseEntity<GetGamesByRoomResponse> getGamesByRoomCode(
           @PathVariable
           @Pattern(regexp = "^[A-Z0-9]{4}$", message = "Room code must be exactly 4 uppercase alphanumeric characters")
           String roomCode
   ) {
-    GameStatusResponse response = roomService.checkGameStatus(roomCode);
+    GetGamesByRoomResponse response = roomService.getGamesByRoomCode(roomCode);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 }
