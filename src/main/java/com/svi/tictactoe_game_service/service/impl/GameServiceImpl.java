@@ -1,7 +1,7 @@
 package com.svi.tictactoe_game_service.service.impl;
 
 import com.svi.tictactoe_game_service.dto.request.room.SaveMoveRequest;
-import com.svi.tictactoe_game_service.dto.response.game.GetGameResponse;
+import com.svi.tictactoe_game_service.dto.response.game.GetGamesByGameIdResponse;
 import com.svi.tictactoe_game_service.entity.Move;
 import com.svi.tictactoe_game_service.enums.MoveError;
 import com.svi.tictactoe_game_service.exception.InvalidMoveException;
@@ -42,15 +42,15 @@ public class GameServiceImpl implements GameService {
     moveRepository.save(move);
   }
 
-  public GetGameResponse getMovesByGameId(UUID gameId) {
+  public GetGamesByGameIdResponse getMovesByGameId(UUID gameId) {
     List<Move> moves = moveRepository.findAllByGameId(gameId);
 
-    List<GetGameResponse.MoveDto> moveDtoList = moves.
+    List<GetGamesByGameIdResponse.MoveDto> moveDtoList = moves.
             stream()
             .map(GameMapper::toMoveDto)
             .toList();
 
-    return new GetGameResponse(moveDtoList);
+    return new GetGamesByGameIdResponse(moveDtoList);
   }
 
   // UTILS

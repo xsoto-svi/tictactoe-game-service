@@ -1,15 +1,15 @@
 package com.svi.tictactoe_game_service.mapper;
 
 import com.svi.tictactoe_game_service.dto.request.room.SaveMoveRequest;
-import com.svi.tictactoe_game_service.dto.response.game.GetGameResponse;
+import com.svi.tictactoe_game_service.dto.response.game.GetGamesByGameIdResponse;
 import com.svi.tictactoe_game_service.entity.Move;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class GameMapper {
-  public static GetGameResponse.MoveDto toMoveDto(Move move) {
-    return new GetGameResponse.MoveDto(
+  public static GetGamesByGameIdResponse.MoveDto toMoveDto(Move move) {
+    return new GetGamesByGameIdResponse.MoveDto(
             move.getName(),
             move.getSymbol(),
             move.getLocation()
