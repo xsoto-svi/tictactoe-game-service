@@ -78,28 +78,30 @@ public class RoomServiceImpl implements RoomService {
   }
 
   public void rematchGame(String roomCode, JoinGameRequest request) {
-    Room currRoom = findRoom(roomCode);
+    Room room = findRoom(roomCode);
 
-    GameStatus status = currRoom.getStatus();
+
+    GameStatus status = room.getStatus();
 
     if (status == GameStatus.REMATCH_WAITING) {
       // second player accepts
 
       // Close current game
-      currRoom.setStatus(GameStatus.CLOSED);
-      roomRepository.save(currRoom);
+      room.setStatus(GameStatus.CLOSED);
+      roomRepository.save(room);
 
       saveNewRoom(roomCode, generateGameId(), GameStatus.IN_PROGRESS);
 
-//      List<Player> oldPlayers = playerRepository.findByGameId(currRoom.getGameId());
-//
-//      for (Player player : oldPlayers) {
-//        saveNewPlayer(player.getPlayerName(), newGameId, roomCode);
-//      }
+      List<Player> oldPlayers = playerRepository.findByGameId(room.getGameId());
+
+      for (Player player : oldPlayers) {
+        saveNewPlayer(player.getPlayerName(), newGameId, roomCode);
+      }
     } else {
       // first player starts a rematch
-      currRoom.setStatus(GameStatus.REMATCH_WAITING);
-      roomRepository.save(currRoom);
+      room.setStatus(GameStatus.REMATCH_WAITING);
+      roomRepository.save(room);
+
     }
   }
 
