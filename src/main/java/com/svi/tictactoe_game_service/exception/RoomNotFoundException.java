@@ -3,8 +3,8 @@ package com.svi.tictactoe_game_service.exception;
 import com.svi.tictactoe_game_service.enums.ErrorMessage;
 import org.springframework.http.HttpStatus;
 
-public class RoomNotFoundException extends ApiException {
+public class RoomNotFoundException extends RuntimeException {
   public RoomNotFoundException() {
-    super(HttpStatus.NOT_FOUND, ErrorMessage.ROOM_NOT_FOUND.getMessage());
+    super(ErrorMessage.ROOM_NOT_FOUND.getMessage());
   }
 }

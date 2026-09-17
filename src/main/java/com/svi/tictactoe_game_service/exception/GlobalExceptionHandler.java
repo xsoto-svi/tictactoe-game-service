@@ -23,9 +23,16 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(RoomNotFoundException.class)
-  public ResponseEntity<ErrorResponse> handle(RoomNotFoundException ex) {
+  public ResponseEntity<ErrorResponse> handleRoomNotFoundException(RoomNotFoundException ex) {
     log.error("error: ", ex);
     ErrorResponse response = new ErrorResponse(ex.getMessage());
-    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+  }
+
+  @ExceptionHandler(InvalidMoveException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidMoveException(InvalidMoveException ex) {
+    log.error("error: ", ex);
+    ErrorResponse response = new ErrorResponse(ex.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 }
