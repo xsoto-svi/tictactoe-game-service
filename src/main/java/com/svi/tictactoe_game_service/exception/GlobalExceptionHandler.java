@@ -1,6 +1,7 @@
 package com.svi.tictactoe_game_service.exception;
 
 import com.svi.tictactoe_game_service.dto.response.ErrorResponse;
+import com.svi.tictactoe_game_service.enums.ErrorMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(DataAccessException.class)
   public ResponseEntity<ErrorResponse> handleDatabaseException(DataAccessException ex) {
     log.error("error: ", ex);
-    ErrorResponse response = new ErrorResponse("A database error occurred. Please try again later.");
+    ErrorResponse response = new ErrorResponse(ErrorMessage.DATABASE_ERROR.getMessage());
     return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
   }
 
@@ -46,10 +47,7 @@ public class GlobalExceptionHandler {
 
     String typeName = (requiredType != null) ? requiredType.getSimpleName() : "valid format";
 
-    String message = String.format(
-            "Failed to convert parameter '%s' with value '%s' to required type '%s'",
-            paramName, providedValue, typeName
-    );
+    String message = ErrorMessage.METHOD_ARGUMENT_MISMATCH.formatMessage(paramName, providedValue, typeName);
 
     log.warn("Path/Query variable conversion error: {}", message);
 
