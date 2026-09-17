@@ -5,5 +5,5 @@ import com.svi.tictactoe_game_service.dto.response.player.GetPlayersResponse;
 
 public interface PlayerService {
   GetPlayersResponse getPlayers();
-  GetGamesByPlayerResponse getGamesByPlayerName(String playerName);
+  GetGamesByPlayerResponse getGamesByPlayerName(String name);
 }
