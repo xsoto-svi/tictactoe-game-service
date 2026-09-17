@@ -19,6 +19,7 @@ public class PlayerServiceImpl implements PlayerService {
     this.playerRepository = playerRepository;
   }
 
+  @Override
   public GetPlayersResponse getPlayers(){
     List<Player> players = playerRepository.findAll();
 
@@ -29,6 +30,7 @@ public class PlayerServiceImpl implements PlayerService {
     return new GetPlayersResponse(playerNames);
   }
 
+  @Override
   public GetGamesByPlayerResponse getGamesByPlayerName(String name){
     List<Player> players = playerRepository.findAllByPlayerName(name);
 

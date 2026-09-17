@@ -30,6 +30,7 @@ public class GameServiceImpl implements GameService {
     this.moveRepository = moveRepository;
   }
 
+  @Override
   public void addMove(UUID gameId, SaveMoveRequest request){
     List<Move> existingMoves = moveRepository.findAllByGameId(gameId);
 
@@ -42,6 +43,7 @@ public class GameServiceImpl implements GameService {
     moveRepository.save(move);
   }
 
+  @Override
   public GetGamesByGameIdResponse getMovesByGameId(UUID gameId) {
     List<Move> moves = moveRepository.findAllByGameId(gameId);
 

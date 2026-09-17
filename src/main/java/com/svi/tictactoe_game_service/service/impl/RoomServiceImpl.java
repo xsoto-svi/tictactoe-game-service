@@ -37,6 +37,7 @@ public class RoomServiceImpl implements RoomService {
   }
 
   // returns player symbol
+  @Override
   public MatchMakingResponse createGame(CreateGameRequest request) {
     String roomCode = generateUniqueRoomCode();
     UUID gameId = generateGameId();
@@ -47,6 +48,7 @@ public class RoomServiceImpl implements RoomService {
   }
 
   // returns player symbol
+  @Override
   public MatchMakingResponse joinGame(String roomCode, JoinGameRequest request) {
     Room room = findRoom(roomCode);
 
@@ -72,12 +74,14 @@ public class RoomServiceImpl implements RoomService {
     return new MatchMakingResponse(symbol, room.getGameId(), roomCode);
   }
 
+  @Override
   public GameStatusResponse checkGameStatus(String roomCode) {
     Room room = findRoom(roomCode);
 
     return new GameStatusResponse(room.getStatus());
   }
 
+  @Override
   public RematchResponse rematchGame(String roomCode, RematchGameRequest request) {
     Room currRoom = findRoom(roomCode);
     GameStatus status = currRoom.getStatus();
@@ -112,6 +116,7 @@ public class RoomServiceImpl implements RoomService {
     }
   }
 
+  @Override
   public void leaveGame(String roomCode, LeaveGameRequest request) {
     Room room = findRoom(roomCode);
 
@@ -121,6 +126,7 @@ public class RoomServiceImpl implements RoomService {
     }
   }
 
+  @Override
   public GetRoomsResponse getRooms() {
     List<Room> rooms = roomRepository.findAll();
 
@@ -131,6 +137,7 @@ public class RoomServiceImpl implements RoomService {
     return new GetRoomsResponse(roomCodes);
   }
 
+  @Override
   public GetGamesByRoomResponse getGamesByRoomCode(String roomCode) {
     List<Room> rooms = roomRepository.findByRoomCode(roomCode);
 
