@@ -14,10 +14,12 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/rooms")
+@Validated
 public class RoomController {
 
   private final RoomService roomService;
@@ -26,13 +28,13 @@ public class RoomController {
     this.roomService = roomService;
   }
 
-  @PostMapping("rooms")
+  @PostMapping
   public ResponseEntity<MatchMakingResponse> createGame(@Valid @RequestBody CreateGameRequest request) {
     MatchMakingResponse response = roomService.createGame(request);
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
-  @PostMapping("rooms/{roomCode}/join")
+  @PostMapping("/{roomCode}/join")
   public ResponseEntity<MatchMakingResponse> joinGame(
           @PathVariable
           @Pattern(regexp = "^[A-Z0-9]{4}$", message = "Room code must be exactly 4 uppercase alphanumeric characters")
@@ -44,7 +46,7 @@ public class RoomController {
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
-  @PostMapping("rooms/{roomCode}/leave")
+  @PostMapping("/{roomCode}/leave")
   public ResponseEntity<Void> leaveGame(
           @PathVariable
           @Pattern(regexp = "^[A-Z0-9]{4}$", message = "Room code must be exactly 4 uppercase alphanumeric characters")
@@ -56,7 +58,7 @@ public class RoomController {
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
-  @PostMapping("rooms/{roomCode}/rematch")
+  @PostMapping("/{roomCode}/rematch")
   public ResponseEntity<RematchResponse> rematchGame(
           @PathVariable
           @Pattern(regexp = "^[A-Z0-9]{4}$", message = "Room code must be exactly 4 uppercase alphanumeric characters")
@@ -68,7 +70,7 @@ public class RoomController {
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
-  @GetMapping("rooms/{roomCode}/status")
+  @GetMapping("/{roomCode}/status")
   public ResponseEntity<GameStatusResponse> checkGameStatus(
           @PathVariable
           @Pattern(regexp = "^[A-Z0-9]{4}$", message = "Room code must be exactly 4 uppercase alphanumeric characters")
@@ -78,13 +80,13 @@ public class RoomController {
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
-  @GetMapping("rooms")
+  @GetMapping("")
   public ResponseEntity<GetRoomsResponse> getRooms() {
     GetRoomsResponse response = roomService.getRooms();
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
-  @GetMapping("rooms/{roomCode}/games")
+  @GetMapping("/{roomCode}/games")
   public ResponseEntity<GetGamesByRoomResponse> getGamesByRoomCode(
           @PathVariable
           @Pattern(regexp = "^[A-Z0-9]{4}$", message = "Room code must be exactly 4 uppercase alphanumeric characters")
