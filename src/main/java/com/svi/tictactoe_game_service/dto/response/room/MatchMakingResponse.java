@@ -1,4 +1,4 @@
-package com.svi.tictactoe_game_service.dto.response;
+package com.svi.tictactoe_game_service.dto.response.room;
 
 import com.svi.tictactoe_game_service.enums.PlayerSymbol;
 
