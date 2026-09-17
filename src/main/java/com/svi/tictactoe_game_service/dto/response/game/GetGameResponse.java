@@ -6,7 +6,7 @@ public record GetGameResponse(
         List<MoveDto> moves
 ) {
   public record MoveDto(
-          String playerName,
+          String name,
           String symbol,
           int location
   ) {}
