@@ -1,4 +1,9 @@
 package com.svi.tictactoe_game_service.dto.request.room;
 
-public class RematchGameRequest {
+import jakarta.validation.constraints.NotBlank;
+
+public record RematchGameRequest(
+        @NotBlank(message = "Name cannot be empty")
+        String name
+) {
 }

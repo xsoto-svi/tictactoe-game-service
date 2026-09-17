@@ -3,10 +3,12 @@ package com.svi.tictactoe_game_service.service.impl;
 import com.svi.tictactoe_game_service.dto.request.room.CreateGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.JoinGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.LeaveGameRequest;
+import com.svi.tictactoe_game_service.dto.request.room.RematchGameRequest;
 import com.svi.tictactoe_game_service.dto.response.MatchMakingResponse;
 import com.svi.tictactoe_game_service.dto.response.game.GameStatusResponse;
 import com.svi.tictactoe_game_service.dto.response.room.GetGamesByRoomResponse;
 import com.svi.tictactoe_game_service.dto.response.room.GetRoomsResponse;
+import com.svi.tictactoe_game_service.dto.response.room.RematchResponse;
 import com.svi.tictactoe_game_service.entity.Player;
 import com.svi.tictactoe_game_service.entity.Room;
 import com.svi.tictactoe_game_service.enums.GameStatus;
@@ -38,7 +40,7 @@ public class RoomServiceImpl implements RoomService {
   public MatchMakingResponse createGame(String roomCode, CreateGameRequest request) {
     UUID gameId = generateGameId();
     saveNewRoom(roomCode, gameId, GameStatus.WAITING);
-    saveNewPlayer(request.playerName(), gameId, roomCode);
+    saveNewPlayer(request.name(), gameId, roomCode);
 
     return new MatchMakingResponse(PlayerSymbol.X, gameId);
   }
@@ -48,7 +50,7 @@ public class RoomServiceImpl implements RoomService {
     Room room = findRoom(roomCode);
 
     GameStatus status = room.getStatus();
-    PlayerSymbol symbol = request.symbol();
+    PlayerSymbol symbol;
 
     if (status == GameStatus.WAITING) {
       room.setStatus(GameStatus.IN_PROGRESS);
@@ -75,31 +77,37 @@ public class RoomServiceImpl implements RoomService {
     return new GameStatusResponse(room.getStatus());
   }
 
-  public void rematchGame(String roomCode, JoinGameRequest request) {
-    Room room = findRoom(roomCode);
-    String name = request.name();
-
-    GameStatus status = room.getStatus();
+  public RematchResponse rematchGame(String roomCode, RematchGameRequest request) {
+    Room currRoom = findRoom(roomCode);
+    GameStatus status = currRoom.getStatus();
 
     if (status == GameStatus.REMATCH_WAITING) {
-      // second player accepts
+      // --- SECOND PLAYER ACCEPTS ---
+      UUID newGameId = generateGameId();
 
-      // Close current game
-      room.setStatus(GameStatus.CLOSED);
-      roomRepository.save(room);
+      currRoom.setStatus(GameStatus.CLOSED);
+      roomRepository.save(currRoom);
 
-      saveNewRoom(roomCode, generateGameId(), GameStatus.IN_PROGRESS);
+      saveNewRoom(roomCode, newGameId, GameStatus.IN_PROGRESS);
 
-      List<Player> oldPlayers = playerRepository.findByGameId(room.getGameId());
-
-      for (Player player : oldPlayers) {
-        saveNewPlayer(player.getPlayerName(), newGameId, roomCode);
+      // Add new game to current players
+      List<Player> oldPlayers = playerRepository.findByGameId(currRoom.getGameId());
+      for (Player oldPlayer : oldPlayers) {
+        saveNewPlayer(oldPlayer.getPlayerName(), newGameId, roomCode);
       }
+
+      return new RematchResponse(newGameId);
+
     } else {
-      // first player starts a rematch
-      room.setStatus(GameStatus.REMATCH_WAITING);
-      roomRepository.save(room);
-      playerRepository.save()
+      // --- FIRST PLAYER REQUESTS REMATCH ---
+
+      // Update old room status
+      currRoom.setStatus(GameStatus.REMATCH_WAITING);
+      roomRepository.save(currRoom);
+
+      // Returns old id
+      // Player 1 should poll to get the new id when player 2 accepts
+      return new RematchResponse(currRoom.getGameId());
     }
   }
 
