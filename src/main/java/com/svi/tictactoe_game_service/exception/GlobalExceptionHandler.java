@@ -1,7 +1,10 @@
 package com.svi.tictactoe_game_service.exception;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.svi.tictactoe_game_service.dto.response.ErrorResponse;
+import com.svi.tictactoe_game_service.dto.response.ValidationErrorResponse;
 import com.svi.tictactoe_game_service.enums.ErrorMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -18,7 +21,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -74,34 +80,51 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ErrorResponse> handleDtoValidation(MethodArgumentNotValidException ex) {
+  public ResponseEntity<ValidationErrorResponse> handleDtoValidation(MethodArgumentNotValidException ex) {
     log.error("error: ", ex);
 
-    FieldError fieldError = ex.getBindingResult().getFieldError();
-    String cleanMessage = "Validation failed";
+    // Collects every @Valid failure into a list of strings
+    List<String> errors = ex.getBindingResult().getFieldErrors().stream()
+            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .collect(Collectors.toList());
 
-    if (fieldError != null) {
-      cleanMessage = fieldError.getField() + ": " + fieldError.getDefaultMessage();
-    }
-
-    ErrorResponse response = new ErrorResponse(cleanMessage);
+    ValidationErrorResponse response = new ValidationErrorResponse("Validation failed", errors);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 
-  // Handles malformed JSON bodies
   @ExceptionHandler(HttpMessageNotReadableException.class)
-  public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+  public ResponseEntity<ValidationErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
     log.error("error: ", ex);
 
-    String cleanMessage = "Malformed JSON request body.";
+    String mainMessage = "Malformed JSON request body.";
+    List<String> errors = new ArrayList<>();
+    Throwable cause = ex.getCause();
 
-    if (ex.getCause() instanceof InvalidFormatException invalidFormatException) {
-      if (invalidFormatException.getTargetType() != null && invalidFormatException.getTargetType().isAssignableFrom(UUID.class)) {
-        cleanMessage = ErrorMessage.INVALID_UUID_REQUEST.getMessage();
+    if (cause instanceof JsonMappingException jsonMappingException) {
+      // Extracts the exact field that failed Jackson deserialization
+      String fieldPath = jsonMappingException.getPath().stream()
+              .map(JsonMappingException.Reference::getFieldName)
+              .collect(Collectors.joining("."));
+
+      if (fieldPath.isEmpty()) fieldPath = "unknown field";
+
+      if (cause instanceof InvalidFormatException invalidFormatException) {
+        if (invalidFormatException.getTargetType() != null && invalidFormatException.getTargetType().isAssignableFrom(UUID.class)) {
+          errors.add(fieldPath + ": Invalid UUID format provided.");
+        } else {
+          errors.add(fieldPath + ": Invalid data format provided.");
+        }
+      } else {
+        errors.add(fieldPath + ": Incorrect data type provided.");
       }
+    } else if (cause instanceof JsonParseException) {
+      // Catches raw syntax errors like trailing commas or missing quotes
+      errors.add("JSON syntax error. Please check for trailing commas or malformed structure.");
+    } else {
+      errors.add("Request body is missing or unreadable.");
     }
 
-    ErrorResponse response = new ErrorResponse(cleanMessage);
+    ValidationErrorResponse response = new ValidationErrorResponse(mainMessage, errors);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 
