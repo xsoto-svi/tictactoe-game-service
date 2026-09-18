@@ -3,7 +3,6 @@ package com.svi.tictactoe_game_service.service;
 import com.svi.tictactoe_game_service.dto.request.room.CreateGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.JoinGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.LeaveGameRequest;
-import com.svi.tictactoe_game_service.dto.request.room.RematchGameRequest;
 import com.svi.tictactoe_game_service.dto.response.room.MatchMakingResponse;
 import com.svi.tictactoe_game_service.dto.response.game.GameStatusResponse;
 import com.svi.tictactoe_game_service.dto.response.room.GetGamesByRoomResponse;
@@ -14,7 +13,7 @@ public interface RoomService {
   MatchMakingResponse createGame(CreateGameRequest request);
   MatchMakingResponse joinGame(String roomCode, JoinGameRequest request);
   void leaveGame(String roomCode, LeaveGameRequest request);
-  RematchResponse rematchGame(String roomCode, RematchGameRequest request);
+  RematchResponse rematchGame(String roomCode);
   GameStatusResponse checkGameStatus(String roomCode);
   GetRoomsResponse getRooms();
   GetGamesByRoomResponse getGamesByRoomCode(String roomCode);

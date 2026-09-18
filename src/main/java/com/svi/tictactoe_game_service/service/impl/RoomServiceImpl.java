@@ -3,7 +3,6 @@ package com.svi.tictactoe_game_service.service.impl;
 import com.svi.tictactoe_game_service.dto.request.room.CreateGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.JoinGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.LeaveGameRequest;
-import com.svi.tictactoe_game_service.dto.request.room.RematchGameRequest;
 import com.svi.tictactoe_game_service.dto.response.room.MatchMakingResponse;
 import com.svi.tictactoe_game_service.dto.response.game.GameStatusResponse;
 import com.svi.tictactoe_game_service.dto.response.room.GetGamesByRoomResponse;
@@ -82,7 +81,7 @@ public class RoomServiceImpl implements RoomService {
   }
 
   @Override
-  public RematchResponse rematchGame(String roomCode, RematchGameRequest request) {
+  public RematchResponse rematchGame(String roomCode) {
     Room currRoom = findRoom(roomCode);
     GameStatus status = currRoom.getStatus();
 
