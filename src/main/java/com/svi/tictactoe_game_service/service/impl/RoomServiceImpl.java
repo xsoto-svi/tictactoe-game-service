@@ -56,12 +56,7 @@ public class RoomServiceImpl implements RoomService {
     PlayerSymbol symbol;
 
     if (status == GameStatus.WAITING) {
-      List<Player> existingPlayers = playerRepository.findAllByGameId(room.getGameId());
-
-      boolean nameAlreadyTaken = existingPlayers.stream()
-              .anyMatch(player -> player.getName().equalsIgnoreCase(request.name()));
-
-      if (nameAlreadyTaken) {
+      if (playerRepository.existsByGameIdAndName(room.getGameId(), request.name())){
         throw new NameAlreadyTakenException();
       }
 

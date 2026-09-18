@@ -9,6 +9,7 @@ import java.util.UUID;
 
 @Repository
 public interface PlayerRepository extends CassandraRepository<Player, String> {
+  boolean existsByGameIdAndName(UUID gameId, String name);
   List<Player> findAllByGameId(UUID gameId);
   List<Player> findAllByName(String name);
 }
