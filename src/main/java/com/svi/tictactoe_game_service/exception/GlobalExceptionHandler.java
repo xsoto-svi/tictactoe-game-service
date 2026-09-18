@@ -3,6 +3,8 @@ package com.svi.tictactoe_game_service.exception;
 import com.svi.tictactoe_game_service.dto.response.ErrorResponse;
 import com.svi.tictactoe_game_service.enums.ErrorMessage;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -11,6 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -23,6 +28,21 @@ public class GlobalExceptionHandler {
     log.error("error: ", ex);
     ErrorResponse response = new ErrorResponse(ErrorMessage.DATABASE_ERROR.getMessage());
     return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<Map<String, String>> handleConstraintViolation(ConstraintViolationException ex) {
+    // Extract just the raw message from the first violation
+    String cleanMessage = ex.getConstraintViolations().stream()
+            .map(ConstraintViolation::getMessage)
+            .findFirst()
+            .orElse("Validation failed");
+
+    // Format your JSON response (you can replace this Map with your own ErrorResponse DTO)
+    Map<String, String> response = new HashMap<>();
+    response.put("message", cleanMessage);
+
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(RoomNotFoundException.class)
