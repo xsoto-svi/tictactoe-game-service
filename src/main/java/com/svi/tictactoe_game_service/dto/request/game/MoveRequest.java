@@ -22,7 +22,7 @@ public record MoveRequest(
         @NotNull(message = "Location cannot be blank")
         @Min(value = 0, message = "Location must be between 0 and 8")
         @Max(value = 8, message = "Location must be between 0 and 8")
-        int location,
+        Integer location,
 
         LocalDateTime dateSave
 ) {

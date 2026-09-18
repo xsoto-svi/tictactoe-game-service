@@ -8,6 +8,6 @@ public record GetGamesByGameIdResponse(
   public record MoveDto(
           String name,
           String symbol,
-          int location
+          Integer location
   ) {}
 }
