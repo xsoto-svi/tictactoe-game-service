@@ -77,7 +77,7 @@ public class RoomController {
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
-  @GetMapping("")
+  @GetMapping
   public ResponseEntity<GetRoomsResponse> getRooms() {
     GetRoomsResponse response = roomService.getRooms();
     return ResponseEntity.status(HttpStatus.OK).body(response);
