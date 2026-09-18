@@ -20,7 +20,7 @@ public class PlayerController {
   }
 
   @GetMapping
-  public ResponseEntity<GetPlayersResponse> getRooms() {
+  public ResponseEntity<GetPlayersResponse> getPlayers() {
     GetPlayersResponse response = playerService.getPlayers();
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
