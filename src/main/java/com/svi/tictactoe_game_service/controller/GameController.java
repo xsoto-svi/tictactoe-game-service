@@ -2,6 +2,7 @@ package com.svi.tictactoe_game_service.controller;
 
 import com.svi.tictactoe_game_service.dto.request.game.MoveRequest;
 import com.svi.tictactoe_game_service.dto.response.game.GetGamesByGameIdResponse;
+import com.svi.tictactoe_game_service.dto.response.game.MoveResponse;
 import com.svi.tictactoe_game_service.service.GameService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,13 +24,13 @@ public class GameController {
   }
 
   @PostMapping("/{gameId}/moves")
-  public ResponseEntity<Void> addMove(
+  public ResponseEntity<MoveResponse> addMove(
           @PathVariable
           UUID gameId,
           @Valid @RequestBody MoveRequest request
   ) {
-    gameService.processMove(gameId, request);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    MoveResponse response = gameService.processMove(gameId, request);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
   @GetMapping("/{gameId}/games")
