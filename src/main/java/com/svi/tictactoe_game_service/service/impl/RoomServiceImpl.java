@@ -3,6 +3,7 @@ package com.svi.tictactoe_game_service.service.impl;
 import com.svi.tictactoe_game_service.dto.request.room.CreateGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.JoinGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.LeaveGameRequest;
+import com.svi.tictactoe_game_service.dto.request.room.RematchGameRequest;
 import com.svi.tictactoe_game_service.dto.response.room.MatchMakingResponse;
 import com.svi.tictactoe_game_service.dto.response.game.GameStatusResponse;
 import com.svi.tictactoe_game_service.dto.response.room.GetGamesByRoomResponse;
@@ -12,6 +13,7 @@ import com.svi.tictactoe_game_service.entity.Player;
 import com.svi.tictactoe_game_service.entity.Room;
 import com.svi.tictactoe_game_service.enums.GameStatus;
 import com.svi.tictactoe_game_service.enums.PlayerSymbol;
+import com.svi.tictactoe_game_service.exception.InvalidGameException;
 import com.svi.tictactoe_game_service.exception.NameAlreadyTakenException;
 import com.svi.tictactoe_game_service.exception.RoomNotFoundException;
 import com.svi.tictactoe_game_service.repository.PlayerRepository;
@@ -86,37 +88,39 @@ public class RoomServiceImpl implements RoomService {
   }
 
   @Override
-  public RematchResponse rematchGame(String roomCode) {
+  public RematchResponse rematchGame(String roomCode, RematchGameRequest request) {
+    // findRoom() will return the GAME_OVER game for Player 1,
+    // and the new WAITING game for Player 2.
     Room currRoom = findRoom(roomCode);
     GameStatus status = currRoom.getStatus();
 
-    if (status == GameStatus.REMATCH_WAITING) {
-      // --- SECOND PLAYER ACCEPTS ---
-      UUID newGameId = generateGameId();
+    if (status == GameStatus.GAME_OVER) {
+      // --- FIRST PLAYER REQUESTS REMATCH ---
 
+      // Close the old room so findRoom() skips it next time
       currRoom.setStatus(GameStatus.CLOSED);
       roomRepository.save(currRoom);
 
-      saveNewRoom(roomCode, newGameId, GameStatus.IN_PROGRESS);
+      UUID newGameId = generateGameId();
+      saveNewRoom(roomCode, newGameId, GameStatus.REMATCH_WAITING);
 
-      // Add new game to current players
-      List<Player> oldPlayers = playerRepository.findAllByGameId(currRoom.getGameId());
-      for (Player oldPlayer : oldPlayers) {
-        saveNewPlayer(oldPlayer.getName(), newGameId, roomCode);
-      }
+      saveNewPlayer(request.name(), newGameId, roomCode);
 
       return new RematchResponse(newGameId);
+    } else if (status == GameStatus.REMATCH_WAITING) {
+      // --- SECOND PLAYER ACCEPTS REMATCH ---
 
-    } else {
-      // --- FIRST PLAYER REQUESTS REMATCH ---
-
-      // Update old room status
-      currRoom.setStatus(GameStatus.REMATCH_WAITING);
+      // Activate the game Player 1 already created
+      currRoom.setStatus(GameStatus.IN_PROGRESS);
       roomRepository.save(currRoom);
 
-      // Returns old id
-      // Player 1 should poll to get the new id when player 2 accepts
+      saveNewPlayer(request.name(), currRoom.getGameId(), roomCode);
+
+      // Returns the same new id. Game is now officially IN_PROGRESS.
       return new RematchResponse(currRoom.getGameId());
+
+    } else {
+      throw new InvalidGameException();
     }
   }
 
