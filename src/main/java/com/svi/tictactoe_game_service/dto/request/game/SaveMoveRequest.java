@@ -1,4 +1,4 @@
-package com.svi.tictactoe_game_service.dto.request.room;
+package com.svi.tictactoe_game_service.dto.request.game;
 
 import jakarta.validation.constraints.*;
 

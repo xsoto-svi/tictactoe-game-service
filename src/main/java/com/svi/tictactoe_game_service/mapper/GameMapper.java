@@ -1,6 +1,6 @@
 package com.svi.tictactoe_game_service.mapper;
 
-import com.svi.tictactoe_game_service.dto.request.room.SaveMoveRequest;
+import com.svi.tictactoe_game_service.dto.request.game.SaveMoveRequest;
 import com.svi.tictactoe_game_service.dto.response.game.GetGamesByGameIdResponse;
 import com.svi.tictactoe_game_service.entity.Move;
 
