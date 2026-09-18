@@ -10,6 +10,7 @@ public enum ErrorMessage {
   TYPE_MISMATCH("Invalid format for parameter %s."),
   UUID_TYPE_MISMATCH("Invalid UUID format for parameter %s."),
   RESOURCE_NOT_FOUND("The requested resource is not found."),
+  INVALID_UUID_REQUEST("Invalid UUID format provided in the request body."),
   NAME_ALREADY_TAKEN("Name is already taken.");
 
   private final String message;

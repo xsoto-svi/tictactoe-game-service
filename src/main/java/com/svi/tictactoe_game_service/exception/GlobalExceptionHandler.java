@@ -1,5 +1,6 @@
 package com.svi.tictactoe_game_service.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.svi.tictactoe_game_service.dto.response.ErrorResponse;
 import com.svi.tictactoe_game_service.enums.ErrorMessage;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -63,6 +67,38 @@ public class GlobalExceptionHandler {
 
     if (ex.getRequiredType() != null && ex.getRequiredType().isAssignableFrom(UUID.class)) {
       cleanMessage = ErrorMessage.UUID_TYPE_MISMATCH.formatMessage(paramName);
+    }
+
+    ErrorResponse response = new ErrorResponse(cleanMessage);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ErrorResponse> handleDtoValidation(MethodArgumentNotValidException ex) {
+    log.error("error: ", ex);
+
+    FieldError fieldError = ex.getBindingResult().getFieldError();
+    String cleanMessage = "Validation failed";
+
+    if (fieldError != null) {
+      cleanMessage = fieldError.getField() + ": " + fieldError.getDefaultMessage();
+    }
+
+    ErrorResponse response = new ErrorResponse(cleanMessage);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
+
+  // Handles malformed JSON bodies
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+    log.error("error: ", ex);
+
+    String cleanMessage = "Malformed JSON request body.";
+
+    if (ex.getCause() instanceof InvalidFormatException invalidFormatException) {
+      if (invalidFormatException.getTargetType() != null && invalidFormatException.getTargetType().isAssignableFrom(UUID.class)) {
+        cleanMessage = ErrorMessage.INVALID_UUID_REQUEST.getMessage();
+      }
     }
 
     ErrorResponse response = new ErrorResponse(cleanMessage);
