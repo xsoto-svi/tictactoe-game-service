@@ -7,7 +7,8 @@ public enum ErrorMessage {
   ROOM_NOT_FOUND("The requested room code does not exist."),
   INVALID_GAME("Game is inactive or does not exist."),
   DATABASE_ERROR("A database error occurred. Please try again later."),
-  METHOD_ARGUMENT_MISMATCH("Failed to convert parameter '%s' with value '%s' to required type '%s'"),
+  TYPE_MISMATCH("Invalid format for parameter %s."),
+  UUID_TYPE_MISMATCH("Invalid UUID format for parameter %s."),
   RESOURCE_NOT_FOUND("The requested resource is not found."),
   NAME_ALREADY_TAKEN("Name is already taken.");
 

@@ -1,7 +1,6 @@
 package com.svi.tictactoe_game_service.exception;
 
 import com.svi.tictactoe_game_service.dto.response.ErrorResponse;
-import com.svi.tictactoe_game_service.dto.response.ValidationErrorResponse;
 import com.svi.tictactoe_game_service.enums.ErrorMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -15,8 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.UUID;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -58,18 +56,16 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-  public ResponseEntity<ErrorResponse> handleMethodArgumentMismatch(MethodArgumentTypeMismatchException ex) {
+  public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+    log.error("error: ", ex);
     String paramName = ex.getName();
-    Object providedValue = ex.getValue();
-    Class<?> requiredType = ex.getRequiredType();
+    String cleanMessage = ErrorMessage.TYPE_MISMATCH.formatMessage(paramName);
 
-    String typeName = (requiredType != null) ? requiredType.getSimpleName() : "valid format";
+    if (ex.getRequiredType() != null && ex.getRequiredType().isAssignableFrom(UUID.class)) {
+      cleanMessage = ErrorMessage.UUID_TYPE_MISMATCH.formatMessage(paramName);
+    }
 
-    String message = ErrorMessage.METHOD_ARGUMENT_MISMATCH.formatMessage(paramName, providedValue, typeName);
-
-    log.warn("Path/Query variable conversion error: {}", message);
-
-    ErrorResponse response = new ErrorResponse(message);
+    ErrorResponse response = new ErrorResponse(cleanMessage);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 
