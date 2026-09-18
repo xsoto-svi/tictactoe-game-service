@@ -126,9 +126,13 @@ public class RoomServiceImpl implements RoomService {
 
   @Override
   public void leaveGame(String roomCode, LeaveGameRequest request) {
-    Room room = findRoom(roomCode);
+    Room room = roomRepository.findByRoomCodeAndGameId(roomCode, request.gameId());
 
-    if (room.getStatus() != GameStatus.CLOSED){
+    if (room == null) {
+      throw new RoomNotFoundException();
+    }
+
+    if (room.getStatus() != GameStatus.CLOSED && room.getStatus() != GameStatus.CANCELLED) {
       room.setStatus(GameStatus.CLOSED);
       roomRepository.save(room);
     }
