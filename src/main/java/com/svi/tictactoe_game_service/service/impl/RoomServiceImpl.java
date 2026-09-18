@@ -12,6 +12,7 @@ import com.svi.tictactoe_game_service.entity.Player;
 import com.svi.tictactoe_game_service.entity.Room;
 import com.svi.tictactoe_game_service.enums.GameStatus;
 import com.svi.tictactoe_game_service.enums.PlayerSymbol;
+import com.svi.tictactoe_game_service.exception.NameAlreadyTakenException;
 import com.svi.tictactoe_game_service.exception.RoomNotFoundException;
 import com.svi.tictactoe_game_service.repository.PlayerRepository;
 import com.svi.tictactoe_game_service.repository.RoomRepository;
@@ -61,7 +62,7 @@ public class RoomServiceImpl implements RoomService {
               .anyMatch(player -> player.getName().equalsIgnoreCase(request.name()));
 
       if (nameAlreadyTaken) {
-        throw new IllegalArgumentException("Player name is already taken in this room.");
+        throw new NameAlreadyTakenException();
       }
 
       room.setStatus(GameStatus.IN_PROGRESS);
