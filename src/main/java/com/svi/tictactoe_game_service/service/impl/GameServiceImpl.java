@@ -1,12 +1,17 @@
 package com.svi.tictactoe_game_service.service.impl;
 
-import com.svi.tictactoe_game_service.dto.request.game.SaveMoveRequest;
+import com.svi.tictactoe_game_service.dto.request.game.MoveRequest;
 import com.svi.tictactoe_game_service.dto.response.game.GetGamesByGameIdResponse;
+import com.svi.tictactoe_game_service.dto.response.game.MoveResponse;
 import com.svi.tictactoe_game_service.entity.Move;
+import com.svi.tictactoe_game_service.entity.Room;
+import com.svi.tictactoe_game_service.enums.GameStatus;
 import com.svi.tictactoe_game_service.enums.MoveError;
+import com.svi.tictactoe_game_service.enums.PlayerSymbol;
 import com.svi.tictactoe_game_service.exception.InvalidMoveException;
-import com.svi.tictactoe_game_service.mapper.GameMapper;
+import com.svi.tictactoe_game_service.mapper.MoveMapper;
 import com.svi.tictactoe_game_service.repository.MoveRepository;
+import com.svi.tictactoe_game_service.repository.RoomRepository;
 import com.svi.tictactoe_game_service.service.GameService;
 import org.springframework.stereotype.Service;
 
@@ -24,23 +29,54 @@ public class GameServiceImpl implements GameService {
           {0, 4, 8}, {2, 4, 6}             // Diagonals
   };
 
+  private final RoomRepository roomRepository;
   private final MoveRepository moveRepository;
 
-  public GameServiceImpl(MoveRepository moveRepository) {
+  public GameServiceImpl(RoomRepository roomRepository, MoveRepository moveRepository) {
+    this.roomRepository = roomRepository;
     this.moveRepository = moveRepository;
   }
 
   @Override
-  public void addMove(UUID gameId, SaveMoveRequest request){
+  public MoveResponse processMove(UUID gameId, MoveRequest request) {
     List<Move> existingMoves = moveRepository.findAllByGameId(gameId);
-
     int nextMoveNumber = existingMoves.size() + 1;
 
-    Move move = GameMapper.toMoveEntity(request, gameId, nextMoveNumber);
+    Move currentMove = MoveMapper.toMoveEntity(request, gameId, nextMoveNumber);
 
-    validateMove(move, existingMoves);
+    validateMove(currentMove, existingMoves);
 
-    moveRepository.save(move);
+    moveRepository.save(currentMove);
+
+    // Add the new move to the local list to evaluate the final board state
+    existingMoves.add(currentMove);
+
+    boolean hasWon = hasAnyPlayerWon(existingMoves);
+    boolean isDraw = existingMoves.size() == 9 && !hasWon;
+
+    GameStatus gameStatus = GameStatus.IN_PROGRESS;
+    PlayerSymbol nextTurn = null;
+    PlayerSymbol winner = null;
+
+    if (hasWon || isDraw) {
+      gameStatus = GameStatus.GAME_OVER;
+
+      if (hasWon) {
+        winner = PlayerSymbol.valueOf(currentMove.getSymbol().toUpperCase());
+      }
+
+      Room room = roomRepository.findByRoomCodeAndGameId(request.roomCode(), gameId);
+      if (room != null) {
+        room.setStatus(gameStatus);
+        roomRepository.save(room);
+      }
+
+    } else {
+      // Game continues, alternate the turn
+      nextTurn = "X".equalsIgnoreCase(currentMove.getSymbol()) ? PlayerSymbol.O : PlayerSymbol.X;
+    }
+
+    return new MoveResponse(hasWon, isDraw, gameStatus, nextTurn, winner);
   }
 
   @Override
@@ -49,7 +85,7 @@ public class GameServiceImpl implements GameService {
 
     List<GetGamesByGameIdResponse.MoveDto> moveDtoList = moves.
             stream()
-            .map(GameMapper::toMoveDto)
+            .map(MoveMapper::toMoveDto)
             .toList();
 
     return new GetGamesByGameIdResponse(moveDtoList);

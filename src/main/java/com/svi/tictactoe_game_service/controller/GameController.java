@@ -1,6 +1,6 @@
 package com.svi.tictactoe_game_service.controller;
 
-import com.svi.tictactoe_game_service.dto.request.game.SaveMoveRequest;
+import com.svi.tictactoe_game_service.dto.request.game.MoveRequest;
 import com.svi.tictactoe_game_service.dto.response.game.GetGamesByGameIdResponse;
 import com.svi.tictactoe_game_service.service.GameService;
 import jakarta.validation.Valid;
@@ -26,9 +26,9 @@ public class GameController {
   public ResponseEntity<Void> addMove(
           @PathVariable
           UUID gameId,
-          @Valid @RequestBody SaveMoveRequest request
+          @Valid @RequestBody MoveRequest request
   ) {
-    gameService.addMove(gameId, request);
+    gameService.processMove(gameId, request);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 

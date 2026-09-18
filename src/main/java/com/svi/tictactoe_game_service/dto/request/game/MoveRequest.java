@@ -4,7 +4,7 @@ import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
 
-public record SaveMoveRequest(
+public record MoveRequest(
         @NotNull(message = "Room code cannot be null")
         @Pattern(
                 regexp = "^[A-Z0-9]{4}$",
