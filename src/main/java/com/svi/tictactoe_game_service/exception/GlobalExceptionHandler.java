@@ -62,6 +62,13 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 
+  @ExceptionHandler(InvalidGameException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidGame(InvalidGameException ex) {
+    log.error("error: ", ex);
+    ErrorResponse response = new ErrorResponse(ex.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
+
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
     log.error("Unhandled exception on {} {}", request.getMethod(), request.getRequestURI(), ex);

@@ -8,6 +8,7 @@ import com.svi.tictactoe_game_service.entity.Room;
 import com.svi.tictactoe_game_service.enums.GameStatus;
 import com.svi.tictactoe_game_service.enums.MoveError;
 import com.svi.tictactoe_game_service.enums.PlayerSymbol;
+import com.svi.tictactoe_game_service.exception.InvalidGameException;
 import com.svi.tictactoe_game_service.exception.InvalidMoveException;
 import com.svi.tictactoe_game_service.mapper.MoveMapper;
 import com.svi.tictactoe_game_service.repository.MoveRepository;
@@ -39,6 +40,11 @@ public class GameServiceImpl implements GameService {
 
   @Override
   public MoveResponse processMove(UUID gameId, MoveRequest request) {
+    Room room = roomRepository.findByRoomCodeAndGameId(request.roomCode(), gameId);
+    if (room == null) {
+      throw new InvalidGameException();
+    }
+
     List<Move> existingMoves = moveRepository.findAllByGameId(gameId);
     int nextMoveNumber = existingMoves.size() + 1;
 
@@ -65,11 +71,8 @@ public class GameServiceImpl implements GameService {
         winner = PlayerSymbol.valueOf(currentMove.getSymbol().toUpperCase());
       }
 
-      Room room = roomRepository.findByRoomCodeAndGameId(request.roomCode(), gameId);
-      if (room != null) {
-        room.setStatus(gameStatus);
-        roomRepository.save(room);
-      }
+      room.setStatus(gameStatus);
+      roomRepository.save(room);
 
     } else {
       // Game continues, alternate the turn
