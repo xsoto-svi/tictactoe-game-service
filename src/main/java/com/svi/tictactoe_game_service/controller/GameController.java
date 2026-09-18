@@ -33,7 +33,7 @@ public class GameController {
   }
 
   @GetMapping("/{gameId}/games")
-  public ResponseEntity<GetGamesByGameIdResponse> getGamesByRoomCode(
+  public ResponseEntity<GetGamesByGameIdResponse> getGamesByGameId(
           @PathVariable
           UUID gameId
   ) {

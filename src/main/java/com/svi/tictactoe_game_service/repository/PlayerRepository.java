@@ -10,5 +10,5 @@ import java.util.UUID;
 @Repository
 public interface PlayerRepository extends CassandraRepository<Player, String> {
   List<Player> findAllByGameId(UUID gameId);
-  List<Player> findAllByPlayerName(String playerName);
+  List<Player> findAllByName(String name);
 }

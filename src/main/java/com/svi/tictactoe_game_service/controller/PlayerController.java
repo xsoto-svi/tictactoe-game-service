@@ -26,7 +26,7 @@ public class PlayerController {
   }
 
   @GetMapping("/{name}/games")
-  public ResponseEntity<GetGamesByPlayerResponse> getGamesByRoomCode(
+  public ResponseEntity<GetGamesByPlayerResponse> getGamesByPlayerName(
           @PathVariable String name
   ) {
     GetGamesByPlayerResponse response = playerService.getGamesByPlayerName(name);

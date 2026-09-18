@@ -33,7 +33,7 @@ public class PlayerServiceImpl implements PlayerService {
 
   @Override
   public GetGamesByPlayerResponse getGamesByPlayerName(String name){
-    List<Player> players = playerRepository.findAllByPlayerName(name);
+    List<Player> players = playerRepository.findAllByName(name);
 
     List<UUID> gameIds = players.stream()
             .map(Player::getGameId)
