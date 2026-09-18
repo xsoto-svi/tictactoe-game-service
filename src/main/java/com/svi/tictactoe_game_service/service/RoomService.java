@@ -14,7 +14,7 @@ public interface RoomService {
   MatchMakingResponse joinGame(String roomCode, JoinGameRequest request);
   void leaveGame(String roomCode, LeaveGameRequest request);
   RematchResponse rematchGame(String roomCode);
-  GameStatusResponse checkGameStatus(String roomCode);
+  GameStatusResponse checkRoomStatus(String roomCode);
   GetRoomsResponse getRooms();
   GetGamesByRoomResponse getGamesByRoomCode(String roomCode);
 }

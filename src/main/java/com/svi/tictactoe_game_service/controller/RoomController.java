@@ -68,12 +68,12 @@ public class RoomController {
   }
 
   @GetMapping("/{roomCode}/status")
-  public ResponseEntity<GameStatusResponse> checkGameStatus(
+  public ResponseEntity<GameStatusResponse> checkRoomStatus(
           @PathVariable
           @Pattern(regexp = "^[A-Z0-9]{4}$", message = "Room code must be exactly 4 uppercase alphanumeric characters")
           String roomCode
   ) {
-    GameStatusResponse response = roomService.checkGameStatus(roomCode);
+    GameStatusResponse response = roomService.checkRoomStatus(roomCode);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 

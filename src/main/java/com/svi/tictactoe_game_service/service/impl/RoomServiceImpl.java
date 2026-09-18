@@ -74,7 +74,7 @@ public class RoomServiceImpl implements RoomService {
   }
 
   @Override
-  public GameStatusResponse checkGameStatus(String roomCode) {
+  public GameStatusResponse checkRoomStatus(String roomCode) {
     Room room = findRoom(roomCode);
 
     return new GameStatusResponse(room.getStatus());
