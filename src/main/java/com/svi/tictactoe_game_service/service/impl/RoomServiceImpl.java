@@ -55,6 +55,15 @@ public class RoomServiceImpl implements RoomService {
     PlayerSymbol symbol;
 
     if (status == GameStatus.WAITING) {
+      List<Player> existingPlayers = playerRepository.findAllByGameId(room.getGameId());
+
+      boolean nameAlreadyTaken = existingPlayers.stream()
+              .anyMatch(player -> player.getName().equalsIgnoreCase(request.name()));
+
+      if (nameAlreadyTaken) {
+        throw new IllegalArgumentException("Player name is already taken in this room.");
+      }
+
       room.setStatus(GameStatus.IN_PROGRESS);
       symbol = PlayerSymbol.O;
 
