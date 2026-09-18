@@ -1,6 +1,7 @@
 package com.svi.tictactoe_game_service.exception;
 
 import com.svi.tictactoe_game_service.dto.response.ErrorResponse;
+import com.svi.tictactoe_game_service.dto.response.ValidationErrorResponse;
 import com.svi.tictactoe_game_service.enums.ErrorMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -31,18 +32,15 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(ConstraintViolationException.class)
-  public ResponseEntity<Map<String, String>> handleConstraintViolation(ConstraintViolationException ex) {
-    // Extract just the raw message from the first violation
+  public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
+    // Extracting just the raw message from the first violation
     String cleanMessage = ex.getConstraintViolations().stream()
             .map(ConstraintViolation::getMessage)
             .findFirst()
             .orElse("Validation failed");
 
-    // Format your JSON response (you can replace this Map with your own ErrorResponse DTO)
-    Map<String, String> response = new HashMap<>();
-    response.put("message", cleanMessage);
-
-    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    ErrorResponse response = new ErrorResponse(cleanMessage);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 
   @ExceptionHandler(RoomNotFoundException.class)
