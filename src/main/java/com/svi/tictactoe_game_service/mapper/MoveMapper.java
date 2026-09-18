@@ -1,13 +1,13 @@
 package com.svi.tictactoe_game_service.mapper;
 
-import com.svi.tictactoe_game_service.dto.request.game.SaveMoveRequest;
+import com.svi.tictactoe_game_service.dto.request.game.MoveRequest;
 import com.svi.tictactoe_game_service.dto.response.game.GetGamesByGameIdResponse;
 import com.svi.tictactoe_game_service.entity.Move;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class GameMapper {
+public class MoveMapper {
   public static GetGamesByGameIdResponse.MoveDto toMoveDto(Move move) {
     return new GetGamesByGameIdResponse.MoveDto(
             move.getName(),
@@ -16,7 +16,7 @@ public class GameMapper {
     );
   }
 
-  public static Move toMoveEntity(SaveMoveRequest request, UUID gameId, int moveNumber) {
+  public static Move toMoveEntity(MoveRequest request, UUID gameId, int moveNumber) {
     Move move = new Move();
     move.setGameId(gameId);
     move.setMoveNumber(moveNumber);
