@@ -1,12 +1,9 @@
 package com.svi.tictactoe_game_service.controller;
 
-import com.svi.tictactoe_game_service.dto.request.room.SaveMoveRequest;
+import com.svi.tictactoe_game_service.dto.request.game.SaveMoveRequest;
 import com.svi.tictactoe_game_service.dto.response.game.GetGamesByGameIdResponse;
-import com.svi.tictactoe_game_service.dto.response.room.GetGamesByRoomResponse;
-import com.svi.tictactoe_game_service.dto.response.room.GetRoomsResponse;
 import com.svi.tictactoe_game_service.service.GameService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
