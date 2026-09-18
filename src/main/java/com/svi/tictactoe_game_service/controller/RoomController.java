@@ -1,6 +1,5 @@
 package com.svi.tictactoe_game_service.controller;
 
-import com.svi.tictactoe_game_service.dto.request.room.LeaveGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.JoinGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.CreateGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.RematchGameRequest;
@@ -16,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/rooms")
@@ -46,27 +47,31 @@ public class RoomController {
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
-  @PostMapping("/{roomCode}/leave")
+  @PostMapping("/{roomCode}/leave/{gameId}")
   public ResponseEntity<Void> leaveGame(
           @PathVariable
           @Pattern(regexp = "^[A-Z0-9]{4}$", message = "Room code must be exactly 4 uppercase alphanumeric characters")
           String roomCode,
 
-          @Valid @RequestBody LeaveGameRequest request
+          @PathVariable
+          UUID gameId
   ) {
-    roomService.leaveGame(roomCode, request);
+    roomService.leaveGame(roomCode, gameId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
-  @PostMapping("/{roomCode}/rematch")
+  @PostMapping("/{roomCode}/rematch/{gameId}")
   public ResponseEntity<RematchResponse> rematchGame(
           @PathVariable
           @Pattern(regexp = "^[A-Z0-9]{4}$", message = "Room code must be exactly 4 uppercase alphanumeric characters")
           String roomCode,
 
+          @PathVariable
+          UUID gameId,
+
           @Valid @RequestBody RematchGameRequest request
   ) {
-    RematchResponse response = roomService.rematchGame(roomCode, request);
+    RematchResponse response = roomService.rematchGame(roomCode, gameId, request);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 

@@ -2,7 +2,6 @@ package com.svi.tictactoe_game_service.service.impl;
 
 import com.svi.tictactoe_game_service.dto.request.room.CreateGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.JoinGameRequest;
-import com.svi.tictactoe_game_service.dto.request.room.LeaveGameRequest;
 import com.svi.tictactoe_game_service.dto.request.room.RematchGameRequest;
 import com.svi.tictactoe_game_service.dto.response.room.MatchMakingResponse;
 import com.svi.tictactoe_game_service.dto.response.game.GameStatusResponse;
@@ -88,8 +87,8 @@ public class RoomServiceImpl implements RoomService {
   }
 
   @Override
-  public RematchResponse rematchGame(String roomCode, RematchGameRequest request) {
-    Room knownRoom = roomRepository.findByRoomCodeAndGameId(roomCode, request.gameId());
+  public RematchResponse rematchGame(String roomCode, UUID gameId, RematchGameRequest request) {
+    Room knownRoom = roomRepository.findByRoomCodeAndGameId(roomCode, gameId);
 
     if (knownRoom == null) {
       throw new InvalidGameException();
@@ -129,8 +128,8 @@ public class RoomServiceImpl implements RoomService {
   }
 
   @Override
-  public void leaveGame(String roomCode, LeaveGameRequest request) {
-    Room room = roomRepository.findByRoomCodeAndGameId(roomCode, request.gameId());
+  public void leaveGame(String roomCode, UUID gameId) {
+    Room room = roomRepository.findByRoomCodeAndGameId(roomCode, gameId);
 
     if (room == null) {
       throw new RoomNotFoundException();
