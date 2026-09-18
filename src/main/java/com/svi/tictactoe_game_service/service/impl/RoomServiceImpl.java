@@ -89,35 +89,39 @@ public class RoomServiceImpl implements RoomService {
 
   @Override
   public RematchResponse rematchGame(String roomCode, RematchGameRequest request) {
-    // findRoom() will return the GAME_OVER game for Player 1,
-    // and the new WAITING game for Player 2.
-    Room currRoom = findRoom(roomCode);
-    GameStatus status = currRoom.getStatus();
+    Room knownRoom = roomRepository.findByRoomCodeAndGameId(roomCode, request.gameId());
 
-    if (status == GameStatus.GAME_OVER) {
+    if (knownRoom == null) {
+      throw new InvalidGameException();
+    }
+
+    if (knownRoom.getStatus() == GameStatus.GAME_OVER) {
       // --- FIRST PLAYER REQUESTS REMATCH ---
-
-      // Close the old room so findRoom() skips it next time
-      currRoom.setStatus(GameStatus.CLOSED);
-      roomRepository.save(currRoom);
+      knownRoom.setStatus(GameStatus.CLOSED);
+      roomRepository.save(knownRoom);
 
       UUID newGameId = generateGameId();
-      saveNewRoom(roomCode, newGameId, GameStatus.REMATCH_WAITING);
-
+      saveNewRoom(roomCode, newGameId, GameStatus.WAITING);
       saveNewPlayer(request.name(), newGameId, roomCode);
 
       return new RematchResponse(newGameId);
-    } else if (status == GameStatus.REMATCH_WAITING) {
+
+    } else if (knownRoom.getStatus() == GameStatus.CLOSED) {
       // --- SECOND PLAYER ACCEPTS REMATCH ---
+      // Player 2 sent the old ID, so we must search the room to find the new WAITING game
+      List<Room> rooms = roomRepository.findByRoomCode(roomCode);
 
-      // Activate the game Player 1 already created
-      currRoom.setStatus(GameStatus.IN_PROGRESS);
-      roomRepository.save(currRoom);
+      Room waitingRoom = rooms.stream()
+              .filter(room -> room.getStatus() == GameStatus.WAITING)
+              .findFirst()
+              .orElseThrow(InvalidGameException::new); // No rematch was actually started
 
-      saveNewPlayer(request.name(), currRoom.getGameId(), roomCode);
+      waitingRoom.setStatus(GameStatus.IN_PROGRESS);
+      roomRepository.save(waitingRoom);
 
-      // Returns the same new id. Game is now officially IN_PROGRESS.
-      return new RematchResponse(currRoom.getGameId());
+      saveNewPlayer(request.name(), waitingRoom.getGameId(), roomCode);
+
+      return new RematchResponse(waitingRoom.getGameId());
 
     } else {
       throw new InvalidGameException();
