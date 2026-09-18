@@ -97,7 +97,7 @@ public class RoomServiceImpl implements RoomService {
       // Add new game to current players
       List<Player> oldPlayers = playerRepository.findAllByGameId(currRoom.getGameId());
       for (Player oldPlayer : oldPlayers) {
-        saveNewPlayer(oldPlayer.getPlayerName(), newGameId, roomCode);
+        saveNewPlayer(oldPlayer.getName(), newGameId, roomCode);
       }
 
       return new RematchResponse(newGameId);
@@ -214,7 +214,7 @@ public class RoomServiceImpl implements RoomService {
 
   private void saveNewPlayer(String playerName, UUID gameId, String roomCode) {
     Player player = new Player();
-    player.setPlayerName(playerName);
+    player.setName(playerName);
     player.setGameId(gameId);
     player.setRoomCode(roomCode);
 

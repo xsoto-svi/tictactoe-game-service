@@ -12,8 +12,8 @@ import java.util.UUID;
 @Table("players")
 public class Player {
 
-  @PrimaryKeyColumn(name = "room_code", type = PrimaryKeyType.PARTITIONED)
-  private String playerName;
+  @PrimaryKeyColumn(name = "name", type = PrimaryKeyType.PARTITIONED)
+  private String name;
 
   @PrimaryKeyColumn(name = "game_id", type = PrimaryKeyType.CLUSTERED)
   private UUID gameId;

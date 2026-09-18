@@ -24,7 +24,7 @@ public class PlayerServiceImpl implements PlayerService {
     List<Player> players = playerRepository.findAll();
 
     List<String> playerNames = players.stream()
-            .map(Player::getPlayerName)
+            .map(Player::getName)
             .distinct()
             .toList();
 
